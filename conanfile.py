@@ -21,7 +21,9 @@ class GmpConan(ConanFile):
 
     def source(self):
         zip_name = "gmp-%s.tar.bz2" % self.version
-        download("http://gmplib.org/download/gmp/%s" % zip_name, zip_name)
+        download("http://gnu.uberglobalmirror.com/gmp/%s" % zip_name, zip_name)
+# gmplib.org is down :(
+#        download("http://gmplib.org/download/gmp/%s" % zip_name, zip_name)
         check_md5(zip_name, "4c175f86e11eb32d8bf9872ca3a8e11d")
         unzip(zip_name)
         os.unlink(zip_name)
@@ -59,7 +61,7 @@ class GmpConan(ConanFile):
                 self.output.info("Activated option! %s" % option_name)
                 config_options_string += " --%s" % option_name.replace("_", "-")
 
-        self.output.warn("*** Detected OS: " + self.settings.os)
+        self.output.warn("*** Detected OS: %s" % (self.settings.os))
 
         if self.settings.os == "Macos":
             config_options_string += " --with-pic"
