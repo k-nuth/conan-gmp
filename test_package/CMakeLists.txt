@@ -10,5 +10,4 @@ SET(CMAKE_VERBOSE_MAKEFILE 1)
 ADD_EXECUTABLE(example example.c)
 include_directories(${CONAN_INCLUDE_DIRS})
 MESSAGE(STATUS ${CONAN_LIBS})
-target_link_libraries(example ${CONAN_LIBS})
-
+target_link_libraries(example ${CONAN_LIBS} m)
