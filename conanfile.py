@@ -3,10 +3,10 @@ import os, shutil
 from conans.tools import download, unzip, replace_in_file, check_md5
 from conans import CMake
 
-class GmpConan(ConanFile):
+class BitprimGmpConan(ConanFile):
     name = "gmp"
-    version = "6.1.1"
-    url = "http://github.com/DEGoodmanWilson/conan-gmp"
+    version = "6.1.2"
+    url = "https://github.com/bitprim/bitprim-conan-gmp"
     ZIP_FOLDER_NAME = "gmp-%s" % version
     generators = "cmake"
     settings =  "os", "compiler", "arch", "build_type"
@@ -20,11 +20,12 @@ class GmpConan(ConanFile):
                       "enable_cxx=True", "disable-fft=False", "enable-assert=False"
 
     def source(self):
+        # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
         zip_name = "gmp-%s.tar.bz2" % self.version
-        download("http://gnu.uberglobalmirror.com/gmp/%s" % zip_name, zip_name)
-# gmplib.org is down :(
-#        download("http://gmplib.org/download/gmp/%s" % zip_name, zip_name)
-        check_md5(zip_name, "4c175f86e11eb32d8bf9872ca3a8e11d")
+        download("http://gmplib.org/download/gmp/%s" % zip_name, zip_name)
+        # download("http://gnu.uberglobalmirror.com/gmp/%s" % zip_name, zip_name)
+
+        # check_md5(zip_name, "4c175f86e11eb32d8bf9872ca3a8e11d") #TODO
         unzip(zip_name)
         os.unlink(zip_name)
 
@@ -50,8 +51,6 @@ class GmpConan(ConanFile):
 
         return command
 
-
-       
     def build(self):
         config_options_string = ""
 
@@ -70,7 +69,6 @@ class GmpConan(ConanFile):
         self.output.warn(configure_command)
         self.run(configure_command)
         self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
-       
 
     def package(self):
         self.copy("*.h", "include", "%s" % (self.ZIP_FOLDER_NAME), keep_path=True)
