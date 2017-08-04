@@ -32,4 +32,4 @@ class DefaultNameConan(ConanFile):
         self.copy(pattern="*.dylib", dst="bin", src="lib")
         
     def test(self):
-        self.run(".%sbin%sexample" % (os.sep, os.sep))
+        self.run(".%sbin%sexample %s" % (os.sep, os.sep, "to.txt"))
