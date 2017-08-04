@@ -4,7 +4,7 @@ from conans.tools import download, unzip, replace_in_file, check_md5
 from conans import CMake
 
 class BitprimGmpConan(ConanFile):
-    name = "bitprim-conan-gmp"
+    name = "gmp"
     version = "6.1.2"
     url = "https://github.com/bitprim/bitprim-conan-gmp"
     ZIP_FOLDER_NAME = "gmp-%s" % version
