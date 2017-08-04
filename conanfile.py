@@ -16,6 +16,7 @@ class BitprimGmpConan(ConanFile):
                "enable_cxx": [True, False],
                "disable-fft": [True, False],
                "enable-assert": [True, False]}
+               
     default_options = "shared=False", "disable_assembly=False", "enable_fat=False", \
                       "enable_cxx=True", "disable-fft=False", "enable-assert=False"
 
