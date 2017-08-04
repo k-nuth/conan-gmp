@@ -4,19 +4,21 @@ from conans.tools import download, unzip, replace_in_file, check_md5
 from conans import CMake
 
 class BitprimGmpConan(ConanFile):
-    name = "gmp"
+    name = "bitprim-conan-gmp"
     version = "6.1.2"
     url = "https://github.com/bitprim/bitprim-conan-gmp"
     ZIP_FOLDER_NAME = "gmp-%s" % version
     generators = "cmake"
     settings =  "os", "compiler", "arch", "build_type"
+    build_policy = "missing"
+
     options = {"shared": [True, False],
                "disable_assembly": [True, False],
                "enable_fat": [True, False],
                "enable_cxx": [True, False],
                "disable-fft": [True, False],
                "enable-assert": [True, False]}
-               
+
     default_options = "shared=False", "disable_assembly=False", "enable_fat=False", \
                       "enable_cxx=True", "disable-fft=False", "enable-assert=False"
 
