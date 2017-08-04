@@ -4,14 +4,10 @@ cmake_minimum_required(VERSION 2.8)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 CONAN_BASIC_SETUP()
 
-SET(GCC_EXPLICIT_LINK_FLAGS    "-lm")
-SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_EXPLICIT_LINK_FLAGS}" )
-
 SET(VERBOSE 1)
 SET(CMAKE_VERBOSE_MAKEFILE 1)
 
 ADD_EXECUTABLE(example example.c)
 include_directories(${CONAN_INCLUDE_DIRS})
 MESSAGE(STATUS ${CONAN_LIBS})
-target_link_libraries(example ${CONAN_LIBS})
-
+target_link_libraries(example ${CONAN_LIBS} m)
