@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/bitprim/bitprim-conan-gmp.svg?branch=master)](https://travis-ci.org/bitprim/bitprim-conan-gmp) [![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/bitprim/bitprim-conan-gmp?branch=master&svg=true)](https://ci.appveyor.com/project/bitprim/bitprim-conan-gmp?branch=master)
 
 # bitprim-conan-gmp
 
