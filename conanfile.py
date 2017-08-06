@@ -75,7 +75,7 @@ class BitprimGmpConan(ConanFile):
         if self.settings.os == "Linux" or self.settings.os == "Macos":
         	self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
         else:
-        	self.run("dir C:\MinGw")
+        	self.run("dir C:\MinGw\bin\")
         	self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
 
     def package(self):
