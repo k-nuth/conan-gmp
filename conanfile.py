@@ -71,7 +71,12 @@ class BitprimGmpConan(ConanFile):
         configure_command = "cd %s && %s ./configure --with-pic --enable-static --enable-shared %s" % (self.ZIP_FOLDER_NAME, self.generic_env_configure_vars(), config_options_string)
         self.output.warn(configure_command)
         self.run(configure_command)
-        self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
+
+        if self.settings.os == "Linux" or self.settings.os == "Macos":
+        	self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
+        else:
+        	self.run("dir C:\MinGw")
+        	self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
 
     def package(self):
         self.copy("*.h", "include", "%s" % (self.ZIP_FOLDER_NAME), keep_path=True)
