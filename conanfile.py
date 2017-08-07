@@ -68,7 +68,10 @@ class BitprimGmpConan(ConanFile):
         if self.settings.os == "Macos":
             config_options_string += " --with-pic"
 
-        configure_command = "cd %s && %s ./configure --with-pic --enable-static --enable-shared %s" % (self.ZIP_FOLDER_NAME, self.generic_env_configure_vars(), config_options_string)
+        
+        disable_assembly = "--disable-assembly" if self.settings.arch == "x86" else ""
+
+        configure_command = "cd %s && %s ./configure --with-pic --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self.generic_env_configure_vars(), config_options_string, disable_assembly)
         self.output.warn(configure_command)
         self.run(configure_command)
 
