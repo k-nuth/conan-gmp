@@ -79,7 +79,7 @@ class BitprimGmpConan(ConanFile):
         	self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
         else:
         	# self.run("dir C:\MinGw\bin\")
-        	self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
+        	self.run("cd %s && C:\MinGw\bin\make" % self.ZIP_FOLDER_NAME)
 
     def package(self):
         self.copy("*.h", "include", "%s" % (self.ZIP_FOLDER_NAME), keep_path=True)
