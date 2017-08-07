@@ -53,7 +53,7 @@ class BitprimGmpConan(ConanFile):
             if verbose:
                 command += " && SET LINK=/VERBOSE"
         else:
-            self.output.warn("Unsupported compiler: " + (str) self.settings.compiler)
+            self.output.warn("Unsupported compiler: " + str(self.settings.compiler))
 
         return command
 
