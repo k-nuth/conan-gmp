@@ -38,6 +38,7 @@ class BitprimGmpConan(ConanFile):
 
     def generic_env_configure_vars(self, verbose=False):
         """Reusable in any lib with configure!!"""
+        command = ""
         if self.settings.os == "Linux" or self.settings.os == "Macos":
             libs = 'LIBS="%s"' % " ".join(["-l%s" % lib for lib in self.deps_cpp_info.libs])
             ldflags = 'LDFLAGS="%s"' % " ".join(["-L%s" % lib for lib in self.deps_cpp_info.lib_paths])
@@ -51,6 +52,8 @@ class BitprimGmpConan(ConanFile):
             command = "SET LIB=%s;%%LIB%% && SET CL=%s" % (lib_paths, cl_args)
             if verbose:
                 command += " && SET LINK=/VERBOSE"
+        elif:
+            self.output.warn("Unsupported compiler: " + self.settings.compiler)
 
         return command
 
