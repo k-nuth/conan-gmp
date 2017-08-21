@@ -3,7 +3,7 @@ env:
    global:
      - CONAN_REFERENCE: "gmp/6.1.2"
      - CONAN_USERNAME: "bitprim"
-     - CONAN_LOGIN_USERNAME: "bitprim@bitprim"
+     - CONAN_LOGIN_USERNAME: "bitprim-bintray"
      - CONAN_CHANNEL: "stable"
      - CONAN_UPLOAD: "https://api.bintray.com/conan/bitprim/bitprim"
      - CONAN_STABLE_BRANCH_PATTERN: "release/*"
