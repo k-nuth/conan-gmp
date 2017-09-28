@@ -2,6 +2,7 @@ from conans import ConanFile
 import os, shutil
 from conans.tools import download, unzip, replace_in_file, check_md5
 from conans import CMake
+from conans import tools
 
 class BitprimGmpConan(ConanFile):
     name = "gmp"
@@ -21,6 +22,8 @@ class BitprimGmpConan(ConanFile):
 
     default_options = "shared=False", "disable_assembly=False", "enable_fat=False", \
                       "enable_cxx=True", "disable-fft=False", "enable-assert=False"
+
+    requires = "m4/1.4.18@bitprim/stable"
 
     def source(self):
         # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
@@ -63,6 +66,32 @@ class BitprimGmpConan(ConanFile):
         return command
 
     def build(self):
+
+        print(os.path.dirname(os.path.abspath(__file__)))
+        print(os.getcwd())
+
+        print('-*-*-*-*-*-*-*-*-*-*')
+        print(os.environ['PATH'])
+
+        old_path = os.environ['PATH']
+
+        # os.environ['PATH'] = os.environ['PATH'] + ':./'
+        os.environ['PATH'] = os.environ['PATH'] + ':' + os.getcwd()
+
+        print('-*-*-*-*-*-*-*-*-*-*')
+        print(os.environ['PATH'])
+
+
+        # print('-*-*-*-*-*-*-*-*-*-*')
+        # print(os.environ['PATH'])
+
+        # with tools.environment_append({"PATH": "./"}):
+        #     print(os.environ['PATH'])
+        #     print('-*-*-*-*-*-*-*-*-*-*')
+
+        # print(os.environ['PATH'])
+        # print('-*-*-*-*-*-*-*-*-*-*')
+
         config_options_string = ""
 
         for option_name in self.options.values.fields:
@@ -85,10 +114,20 @@ class BitprimGmpConan(ConanFile):
 
         # if self.settings.os == "Linux" or self.settings.os == "Macos":
         if self.settings.os != "Windows":
-        	self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
+            self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
         else:
-        	# self.run("dir C:\MinGw\bin\")
-        	self.run("cd %s && C:\MinGw\bin\make" % self.ZIP_FOLDER_NAME)
+            # self.run("dir C:\MinGw\bin\")
+            self.run("cd %s && C:\MinGw\bin\make" % self.ZIP_FOLDER_NAME)
+
+
+        os.environ['PATH'] = old_path
+
+        print('-*-*-*-*-*-*-*-*-*-*')
+        print(os.environ['PATH'])
+
+
+    def imports(self):
+        self.copy("m4", dst=".", src="bin")
 
     def package(self):
         self.copy("*.h", "include", "%s" % (self.ZIP_FOLDER_NAME), keep_path=True)
