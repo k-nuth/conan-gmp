@@ -27,8 +27,8 @@ class BitprimGmpConan(ConanFile):
                       "enable_fat=False", \
                       "enable_cxx=True",  \
                       "disable-fft=False",  \
-                      "enable-assert=False" \
-                      "host='generic'"
+                      "enable-assert=False", \
+                      "host=generic"
 
     requires = "m4/1.4.18@bitprim/stable"
 
