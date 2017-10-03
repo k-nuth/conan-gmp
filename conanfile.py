@@ -18,10 +18,17 @@ class BitprimGmpConan(ConanFile):
                "enable_fat": [True, False],
                "enable_cxx": [True, False],
                "disable-fft": [True, False],
-               "enable-assert": [True, False]}
+               "enable-assert": [True, False],
+               "host": ["auto", "generic", "haswell", "ivy" "sandy"]
+              }
 
-    default_options = "shared=False", "disable_assembly=False", "enable_fat=False", \
-                      "enable_cxx=True", "disable-fft=False", "enable-assert=False"
+    default_options = "shared=False",  \
+                      "disable_assembly=False",  \
+                      "enable_fat=False", \
+                      "enable_cxx=True",  \
+                      "disable-fft=False",  \
+                      "enable-assert=False" \
+                      "host='generic'"
 
     requires = "m4/1.4.18@bitprim/stable"
 
@@ -67,19 +74,18 @@ class BitprimGmpConan(ConanFile):
 
     def build(self):
 
-        print(os.path.dirname(os.path.abspath(__file__)))
-        print(os.getcwd())
-
-        print('-*-*-*-*-*-*-*-*-*-*')
-        print(os.environ['PATH'])
+        # print(os.path.dirname(os.path.abspath(__file__)))
+        # print(os.getcwd())
+        # print('-*-*-*-*-*-*-*-*-*-*')
+        # print(os.environ['PATH'])
 
         old_path = os.environ['PATH']
 
         # os.environ['PATH'] = os.environ['PATH'] + ':./'
         os.environ['PATH'] = os.environ['PATH'] + ':' + os.getcwd()
 
-        print('-*-*-*-*-*-*-*-*-*-*')
-        print(os.environ['PATH'])
+        # print('-*-*-*-*-*-*-*-*-*-*')
+        # print(os.environ['PATH'])
 
 
         # print('-*-*-*-*-*-*-*-*-*-*')
@@ -105,10 +111,28 @@ class BitprimGmpConan(ConanFile):
         if self.settings.os == "Macos":
             config_options_string += " --with-pic"
 
-        
+
+        if self.options.host == 'generic':
+            if self.settings.os == "Macos":
+                # nehalem-apple-darwin15.6.0
+                host_string = " --build=x86_64-apple-darwin --host=x86_64-apple-darwin"
+            elif self.settings.os == "Linux":
+                host_string = " --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu"
+        elif self.options.host == 'auto':
+                host_string = ""
+        elif self.options.host == 'haswell':
+                host_string = " --build=haswell-pc-linux-gnu --host=haswell-pc-linux-gnu"
+        elif self.options.host == 'ivy':
+                host_string = " --build=ivybridge-pc-linux-gnu --host=ivybridge-pc-linux-gnu"
+        elif self.options.host == 'sandy':
+                host_string = " --build=sandybridge-pc-linux-gnu --host=sandybridge-pc-linux-gnu"
+
+
         disable_assembly = "--disable-assembly" if self.settings.arch == "x86" else ""
 
-        configure_command = "cd %s && %s ./configure --with-pic --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self.generic_env_configure_vars(), config_options_string, disable_assembly)
+        # ./configure --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --program-prefix= --disable-dependency-tracking --enable-cxx
+
+        configure_command = "cd %s && %s ./configure %s --with-pic --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self.generic_env_configure_vars(), host_string, config_options_string, disable_assembly)
         self.output.warn(configure_command)
         self.run(configure_command)
 
