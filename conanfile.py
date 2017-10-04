@@ -101,16 +101,16 @@ class BitprimGmpConan(ConanFile):
         config_options_string = ""
 
         for option_name in self.options.values.fields:
-            activated = getattr(self.options, option_name)
-            if activated:
-                self.output.info("Activated option! %s" % option_name)
-                config_options_string += " --%s" % option_name.replace("_", "-")
+            if option_name != 'host':
+                activated = getattr(self.options, option_name)
+                if activated:
+                    self.output.info("Activated option! %s" % option_name)
+                    config_options_string += " --%s" % option_name.replace("_", "-")
 
         self.output.warn("*** Detected OS: %s" % (self.settings.os))
 
         if self.settings.os == "Macos":
             config_options_string += " --with-pic"
-
 
         if self.options.host == 'generic':
             if self.settings.os == "Macos":
@@ -119,18 +119,22 @@ class BitprimGmpConan(ConanFile):
             elif self.settings.os == "Linux":
                 host_string = " --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu"
         elif self.options.host == 'auto':
-                host_string = ""
+            host_string = ""
         elif self.options.host == 'haswell':
-                host_string = " --build=haswell-pc-linux-gnu --host=haswell-pc-linux-gnu"
+            host_string = " --build=haswell-pc-linux-gnu --host=haswell-pc-linux-gnu"
         elif self.options.host == 'ivy':
-                host_string = " --build=ivybridge-pc-linux-gnu --host=ivybridge-pc-linux-gnu"
+            host_string = " --build=ivybridge-pc-linux-gnu --host=ivybridge-pc-linux-gnu"
         elif self.options.host == 'sandy':
-                host_string = " --build=sandybridge-pc-linux-gnu --host=sandybridge-pc-linux-gnu"
-
+            host_string = " --build=sandybridge-pc-linux-gnu --host=sandybridge-pc-linux-gnu"
+        else:
+            host_string = " --build=%s --host=%s" % (self.options.host, self.options.host)
 
         disable_assembly = "--disable-assembly" if self.settings.arch == "x86" else ""
 
         # ./configure --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --program-prefix= --disable-dependency-tracking --enable-cxx
+
+        # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure --with-pic --enable-static --enable-shared  --enable-cxx
+        # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure  --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --with-pic --enable-static --enable-shared  --enable-cxx --host 
 
         configure_command = "cd %s && %s ./configure %s --with-pic --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self.generic_env_configure_vars(), host_string, config_options_string, disable_assembly)
         self.output.warn(configure_command)
