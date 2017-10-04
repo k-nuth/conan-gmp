@@ -19,7 +19,7 @@ class BitprimGmpConan(ConanFile):
                "enable_cxx": [True, False],
                "disable-fft": [True, False],
                "enable-assert": [True, False],
-               "host": "ANY" #["auto", "generic", "haswell", "ivy", "sandy", ...]
+               "host": "ANY" #["auto", "generic", "haswell", "ivybridge", "sandybridge", ...]
               }
 
     default_options = "shared=False",  \

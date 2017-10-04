@@ -43,6 +43,13 @@ matrix:
         osx_image: xcode8.3
         env: CONAN_APPLE_CLANG_VERSIONS=8.1
 
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sysctl -n machdep.cpu.brand_string         ; fi
+
+script:
+  - cd src
+  - make all
+
 install:
   - chmod +x .travis/install.sh
   - ./.travis/install.sh
