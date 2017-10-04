@@ -19,7 +19,7 @@ class BitprimGmpConan(ConanFile):
                "enable_cxx": [True, False],
                "disable-fft": [True, False],
                "enable-assert": [True, False],
-               "host": ["auto", "generic", "haswell", "ivy", "sandy"]
+               "host": "ANY" #["auto", "generic", "haswell", "ivy", "sandy", ...]
               }
 
     default_options = "shared=False",  \
@@ -72,31 +72,64 @@ class BitprimGmpConan(ConanFile):
 
         return command
 
+    def determine_microarch(self):
+        # precondition: self.options.host != 'auto'
+        
+        if self.options.host == 'generic':
+            return (True, 'x86_64')
+        elif self.options.host == 'haswell':
+            return (True, self.options.host)
+        elif self.options.host == 'ivybridge':
+            return (True, self.options.host)
+        elif self.options.host == 'sandybridge':
+            return (True, self.options.host)
+
+        return (False, None)
+
+    def determine_host(self):
+        if self.options.host == 'auto':
+            host_string = ""
+        else:
+            if self.settings.os == "Macos":
+                # nehalem-apple-darwin15.6.0
+                os_part = 'apple-darwin'
+            elif self.settings.os == "Linux":
+                os_part = 'pc-linux-gnu'
+
+            predef, microarch_part = self.determine_microarch()
+
+            if not predef:
+                complete_host = self.options.host
+                # microarch_part = " --build=%s --host=%s" % (self.options.host, self.options.host)
+            else:
+                complete_host = "%s-%s" % (microarch_part, os_part)
+
+            host_string = " --build=%s --host=%s" % (complete_host, complete_host)
+
+        return host_string
+
+
+        # if self.options.host == 'generic':
+        #     if self.settings.os == "Macos":
+        #         # nehalem-apple-darwin15.6.0
+        #         host_string = " --build=x86_64-apple-darwin --host=x86_64-apple-darwin"
+        #     elif self.settings.os == "Linux":
+        #         host_string = " --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu"
+        # elif self.options.host == 'auto':
+        #     host_string = ""
+        # elif self.options.host == 'haswell':
+        #     host_string = " --build=haswell-pc-linux-gnu --host=haswell-pc-linux-gnu"
+        # elif self.options.host == 'ivy':
+        #     host_string = " --build=ivybridge-pc-linux-gnu --host=ivybridge-pc-linux-gnu"
+        # elif self.options.host == 'sandy':
+        #     host_string = " --build=sandybridge-pc-linux-gnu --host=sandybridge-pc-linux-gnu"
+        # else:
+        #     host_string = " --build=%s --host=%s" % (self.options.host, self.options.host)
+
     def build(self):
 
-        # print(os.path.dirname(os.path.abspath(__file__)))
-        # print(os.getcwd())
-        # print('-*-*-*-*-*-*-*-*-*-*')
-        # print(os.environ['PATH'])
-
         old_path = os.environ['PATH']
-
-        # os.environ['PATH'] = os.environ['PATH'] + ':./'
         os.environ['PATH'] = os.environ['PATH'] + ':' + os.getcwd()
-
-        # print('-*-*-*-*-*-*-*-*-*-*')
-        # print(os.environ['PATH'])
-
-
-        # print('-*-*-*-*-*-*-*-*-*-*')
-        # print(os.environ['PATH'])
-
-        # with tools.environment_append({"PATH": "./"}):
-        #     print(os.environ['PATH'])
-        #     print('-*-*-*-*-*-*-*-*-*-*')
-
-        # print(os.environ['PATH'])
-        # print('-*-*-*-*-*-*-*-*-*-*')
 
         config_options_string = ""
 
@@ -112,27 +145,13 @@ class BitprimGmpConan(ConanFile):
         if self.settings.os == "Macos":
             config_options_string += " --with-pic"
 
-        if self.options.host == 'generic':
-            if self.settings.os == "Macos":
-                # nehalem-apple-darwin15.6.0
-                host_string = " --build=x86_64-apple-darwin --host=x86_64-apple-darwin"
-            elif self.settings.os == "Linux":
-                host_string = " --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu"
-        elif self.options.host == 'auto':
-            host_string = ""
-        elif self.options.host == 'haswell':
-            host_string = " --build=haswell-pc-linux-gnu --host=haswell-pc-linux-gnu"
-        elif self.options.host == 'ivy':
-            host_string = " --build=ivybridge-pc-linux-gnu --host=ivybridge-pc-linux-gnu"
-        elif self.options.host == 'sandy':
-            host_string = " --build=sandybridge-pc-linux-gnu --host=sandybridge-pc-linux-gnu"
-        else:
-            host_string = " --build=%s --host=%s" % (self.options.host, self.options.host)
+
+        host_string = self.determine_host()
+        self.output.warn(host_string)
 
         disable_assembly = "--disable-assembly" if self.settings.arch == "x86" else ""
 
         # ./configure --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --program-prefix= --disable-dependency-tracking --enable-cxx
-
         # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure --with-pic --enable-static --enable-shared  --enable-cxx
         # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure  --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --with-pic --enable-static --enable-shared  --enable-cxx --host 
 
@@ -147,12 +166,7 @@ class BitprimGmpConan(ConanFile):
             # self.run("dir C:\MinGw\bin\")
             self.run("cd %s && C:\MinGw\bin\make" % self.ZIP_FOLDER_NAME)
 
-
         os.environ['PATH'] = old_path
-
-        print('-*-*-*-*-*-*-*-*-*-*')
-        print(os.environ['PATH'])
-
 
     def imports(self):
         self.copy("m4", dst=".", src="bin")
