@@ -27,7 +27,7 @@ if __name__ == "__main__":
             opt2 = copy.deepcopy(options)
 
             opt1["gmp:microarchitecture"] = "x86_64"
-            opt1["gmp:microarchitecture"] = ''.join(cpuid.cpu_microarchitecture())
+            opt2["gmp:microarchitecture"] = ''.join(cpuid.cpu_microarchitecture())
 
             print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
             print(options)
