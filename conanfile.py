@@ -1,8 +1,8 @@
 from conans import ConanFile
-import os, shutil
-from conans.tools import download, unzip, replace_in_file, check_md5
-from conans import CMake
-from conans import tools
+import os #, shutil
+from conans.tools import download, unzip #, replace_in_file, check_md5
+# from conans import CMake
+# from conans import tools
 
 class BitprimGmpConan(ConanFile):
     name = "gmp"
@@ -178,7 +178,7 @@ class BitprimGmpConan(ConanFile):
             self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
         else:
             # self.run("dir C:\MinGw\bin\")
-            self.run("cd %s && C:\MinGw\bin\make" % self.ZIP_FOLDER_NAME)
+            self.run("cd %s && C:/MinGw/bin/make" % self.ZIP_FOLDER_NAME)
 
         os.environ['PATH'] = old_path
 

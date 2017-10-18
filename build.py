@@ -2,6 +2,7 @@ import platform
 from conan.packager import ConanMultiPackager
 import os
 import cpuid
+import copy
 
 if __name__ == "__main__":
 
@@ -22,11 +23,11 @@ if __name__ == "__main__":
                 and settings["arch"] == "x86_64" \
                 and not ("gmp:shared" in options and options["gmp:shared"]):
             
-            opt1 = options
-            opt2 = options
+            opt1 = copy.deepcopy(options)
+            opt2 = copy.deepcopy(options)
 
             opt1["gmp:microarchitecture"] = "x86_64"
-            opt1["gmp:microarchitecture"] = cpuid.cpu_microarchitecture()
+            opt1["gmp:microarchitecture"] = ''.join(cpuid.cpu_microarchitecture())
 
             print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
             print(options)
