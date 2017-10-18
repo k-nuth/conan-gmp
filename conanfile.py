@@ -19,7 +19,8 @@ class BitprimGmpConan(ConanFile):
                "enable_cxx": [True, False],
                "disable-fft": [True, False],
                "enable-assert": [True, False],
-               "host": "ANY" #["auto", "generic", "haswell", "ivybridge", "sandybridge", ...]
+               "microarchitecture": "ANY" #["x86_64", "haswell", "ivybridge", "sandybridge", "bulldozer", ...]
+            #    "host": "ANY" #["auto", "generic", "haswell", "ivybridge", "sandybridge", ...]
               }
 
     default_options = "shared=False",  \
@@ -28,7 +29,8 @@ class BitprimGmpConan(ConanFile):
                       "enable_cxx=True",  \
                       "disable-fft=False",  \
                       "enable-assert=False", \
-                      "host=generic"
+                      "homicroarchitecturest=x86_64"
+                    #   "host=generic"
 
     requires = "m4/1.4.18@bitprim/stable"
 
@@ -72,59 +74,71 @@ class BitprimGmpConan(ConanFile):
 
         return command
 
-    def determine_microarch(self):
-        # precondition: self.options.host != 'auto'
-        
-        if self.options.host == 'generic':
-            return (True, 'x86_64')
-        elif self.options.host == 'haswell':
-            return (True, self.options.host)
-        elif self.options.host == 'ivybridge':
-            return (True, self.options.host)
-        elif self.options.host == 'sandybridge':
-            return (True, self.options.host)
-
-        return (False, None)
-
     def determine_host(self):
-        if self.options.host == 'auto':
-            host_string = ""
-        else:
-            if self.settings.os == "Macos":
-                # nehalem-apple-darwin15.6.0
-                os_part = 'apple-darwin'
-            elif self.settings.os == "Linux":
-                os_part = 'pc-linux-gnu'
+        if self.settings.os == "Macos":
+            # nehalem-apple-darwin15.6.0
+            os_part = 'apple-darwin'
+        elif self.settings.os == "Linux":
+            os_part = 'pc-linux-gnu'
 
-            predef, microarch_part = self.determine_microarch()
-
-            if not predef:
-                complete_host = self.options.host
-                # microarch_part = " --build=%s --host=%s" % (self.options.host, self.options.host)
-            else:
-                complete_host = "%s-%s" % (microarch_part, os_part)
-
-            host_string = " --build=%s --host=%s" % (complete_host, complete_host)
-
+        complete_host = "%s-%s" % (self.options.microarchitecture, os_part)
+        host_string = " --build=%s --host=%s" % (complete_host, complete_host)
         return host_string
 
 
-        # if self.options.host == 'generic':
-        #     if self.settings.os == "Macos":
-        #         # nehalem-apple-darwin15.6.0
-        #         host_string = " --build=x86_64-apple-darwin --host=x86_64-apple-darwin"
-        #     elif self.settings.os == "Linux":
-        #         host_string = " --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu"
-        # elif self.options.host == 'auto':
-        #     host_string = ""
-        # elif self.options.host == 'haswell':
-        #     host_string = " --build=haswell-pc-linux-gnu --host=haswell-pc-linux-gnu"
-        # elif self.options.host == 'ivy':
-        #     host_string = " --build=ivybridge-pc-linux-gnu --host=ivybridge-pc-linux-gnu"
-        # elif self.options.host == 'sandy':
-        #     host_string = " --build=sandybridge-pc-linux-gnu --host=sandybridge-pc-linux-gnu"
-        # else:
-        #     host_string = " --build=%s --host=%s" % (self.options.host, self.options.host)
+    # def determine_microarch(self):
+    #     # precondition: self.options.host != 'auto'
+        
+    #     if self.options.host == 'generic':
+    #         return (True, 'x86_64')
+    #     elif self.options.host == 'haswell':
+    #         return (True, self.options.host)
+    #     elif self.options.host == 'ivybridge':
+    #         return (True, self.options.host)
+    #     elif self.options.host == 'sandybridge':
+    #         return (True, self.options.host)
+
+    #     return (False, None)
+
+    # def determine_host(self):
+    #     if self.options.host == 'auto':
+    #         host_string = ""
+    #     else:
+    #         if self.settings.os == "Macos":
+    #             # nehalem-apple-darwin15.6.0
+    #             os_part = 'apple-darwin'
+    #         elif self.settings.os == "Linux":
+    #             os_part = 'pc-linux-gnu'
+
+    #         predef, microarch_part = self.determine_microarch()
+
+    #         if not predef:
+    #             complete_host = self.options.host
+    #             # microarch_part = " --build=%s --host=%s" % (self.options.host, self.options.host)
+    #         else:
+    #             complete_host = "%s-%s" % (microarch_part, os_part)
+
+    #         host_string = " --build=%s --host=%s" % (complete_host, complete_host)
+
+    #     return host_string
+
+
+    #     # if self.options.host == 'generic':
+    #     #     if self.settings.os == "Macos":
+    #     #         # nehalem-apple-darwin15.6.0
+    #     #         host_string = " --build=x86_64-apple-darwin --host=x86_64-apple-darwin"
+    #     #     elif self.settings.os == "Linux":
+    #     #         host_string = " --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu"
+    #     # elif self.options.host == 'auto':
+    #     #     host_string = ""
+    #     # elif self.options.host == 'haswell':
+    #     #     host_string = " --build=haswell-pc-linux-gnu --host=haswell-pc-linux-gnu"
+    #     # elif self.options.host == 'ivy':
+    #     #     host_string = " --build=ivybridge-pc-linux-gnu --host=ivybridge-pc-linux-gnu"
+    #     # elif self.options.host == 'sandy':
+    #     #     host_string = " --build=sandybridge-pc-linux-gnu --host=sandybridge-pc-linux-gnu"
+    #     # else:
+    #     #     host_string = " --build=%s --host=%s" % (self.options.host, self.options.host)
 
     def build(self):
 
@@ -134,7 +148,7 @@ class BitprimGmpConan(ConanFile):
         config_options_string = ""
 
         for option_name in self.options.values.fields:
-            if option_name != 'host':
+            if option_name != 'microarchitecture':
                 activated = getattr(self.options, option_name)
                 if activated:
                     self.output.info("Activated option! %s" % option_name)
