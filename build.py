@@ -1,8 +1,14 @@
 import platform
 from conan.packager import ConanMultiPackager
 import os
+import cpuid
 
 if __name__ == "__main__":
+
+    print(cpuid.cpu_vendor())
+    print(cpuid.cpu_name())
+    print(cpuid.cpu_microarchitecture())
+
     builder = ConanMultiPackager(username="bitprim", channel="stable",
                                  remotes="https://api.bintray.com/conan/bitprim/bitprim")
     builder.add_common_builds(shared_option_name="gmp:shared", pure_c=True)
