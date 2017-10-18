@@ -29,7 +29,7 @@ class BitprimGmpConan(ConanFile):
                       "enable_cxx=True",  \
                       "disable-fft=False",  \
                       "enable-assert=False", \
-                      "homicroarchitecturest=x86_64"
+                      "microarchitecture=x86_64"
                     #   "host=generic"
 
     requires = "m4/1.4.18@bitprim/stable"
