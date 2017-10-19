@@ -39,9 +39,9 @@ class BitprimGmpConan(ConanFile):
 
     def source(self):
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def source(self):")
-        print(options)
+        print(self.options)
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        print(default_options)
+        print(self.default_options)
 
         # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
         zip_name = "gmp-%s.tar.bz2" % self.version
@@ -59,15 +59,15 @@ class BitprimGmpConan(ConanFile):
 
     def configure(self):
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def configure(self):")
-        print(options)
+        print(self.options)
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        print(default_options)
+        print(self.default_options)
 
     def config_options(self):
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def config_options(self):")
-        print(options)
+        print(self.options)
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        print(default_options)
+        print(self.default_options)
 
     def _generic_env_configure_vars(self, verbose=False):
         """Reusable in any lib with configure!!"""
@@ -163,9 +163,9 @@ class BitprimGmpConan(ConanFile):
 
     def build(self):
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def build(self):")
-        print(options)
+        print(self.options)
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        print(default_options)
+        print(self.default_options)
 
         old_path = os.environ['PATH']
         os.environ['PATH'] = os.environ['PATH'] + ':' + os.getcwd()
