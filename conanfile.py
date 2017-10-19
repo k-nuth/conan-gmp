@@ -3,7 +3,29 @@ import os #, shutil
 from conans.tools import download, unzip #, replace_in_file, check_md5
 # from conans import CMake
 # from conans import tools
-import cpuid
+import importlib
+
+
+microarchitecture_default = 'x86_64'
+
+def get_cpuid():
+    try:
+        cpuid = importlib.import_module('cpuid')
+        return cpuid
+    except ImportError:
+        # print("*** cpuid could not be imported")
+        return None
+
+def get_cpu_microarchitecture_or_default(default):
+    cpuid = get_cpuid()
+    if cpuid != None:
+        return '%s%s' % cpuid.cpu_microarchitecture()
+    else:
+        return default
+
+def get_cpu_microarchitecture():
+    return get_cpu_microarchitecture_or_default(microarchitecture_default)
+
 
 class BitprimGmpConan(ConanFile):
     name = "gmp"
@@ -35,8 +57,8 @@ class BitprimGmpConan(ConanFile):
                       "enable-assert=False", \
                       "microarchitecture=_DUMMY_"
                     #   "host=generic"
-
                     #   "microarchitecture=x86_64"
+
     requires = "m4/1.4.18@bitprim/stable"
 
     # def config_options(self):
@@ -59,17 +81,18 @@ class BitprimGmpConan(ConanFile):
         self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
 
         if self.options.microarchitecture == "_DUMMY_":
-            self.options.microarchitecture = "%s%s" % cpuid.cpu_microarchitecture()
+            # self.options.microarchitecture = "%s%s" % cpuid.cpu_microarchitecture()
+            self.options.microarchitecture = get_cpu_microarchitecture()
 
         self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
 
     def source(self):
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def source(self):")
-        print(self.options)
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        print(self.default_options)
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def source(self):")
+        # print(self.options)
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        # print(self.default_options)
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        # self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
 
         # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
         zip_name = "gmp-%s.tar.bz2" % self.version
@@ -179,12 +202,12 @@ class BitprimGmpConan(ConanFile):
     #     #     host_string = " --build=%s --host=%s" % (self.options.host, self.options.host)
 
     def build(self):
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def build(self):")
-        print(self.options)
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        print(self.default_options)
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def build(self):")
+        # print(self.options)
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        # print(self.default_options)
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        # self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
 
         old_path = os.environ['PATH']
         os.environ['PATH'] = os.environ['PATH'] + ':' + os.getcwd()
