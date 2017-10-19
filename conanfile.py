@@ -39,10 +39,12 @@ class BitprimGmpConan(ConanFile):
 
     def config_options(self):
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def config_options(self):")
-        print(self.options)
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        print(self.default_options)
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        # print(self.options)
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        # print(self.default_options)
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
+        del self.options.microarchitecture
         self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
 
     def configure(self):
