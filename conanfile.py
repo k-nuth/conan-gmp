@@ -37,11 +37,29 @@ class BitprimGmpConan(ConanFile):
 
     requires = "m4/1.4.18@bitprim/stable"
 
+    def config_options(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def config_options(self):")
+        print(self.options)
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        print(self.default_options)
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
+
+    def configure(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def configure(self):")
+        print(self.options)
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        print(self.default_options)
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
+
     def source(self):
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def source(self):")
         print(self.options)
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
         print(self.default_options)
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
 
         # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
         zip_name = "gmp-%s.tar.bz2" % self.version
@@ -57,17 +75,6 @@ class BitprimGmpConan(ConanFile):
     #     # del self.settings.compiler.libcxx
 
 
-    def configure(self):
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def configure(self):")
-        print(self.options)
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        print(self.default_options)
-
-    def config_options(self):
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def config_options(self):")
-        print(self.options)
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        print(self.default_options)
 
     def _generic_env_configure_vars(self, verbose=False):
         """Reusable in any lib with configure!!"""
@@ -166,6 +173,8 @@ class BitprimGmpConan(ConanFile):
         print(self.options)
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
         print(self.default_options)
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
 
         old_path = os.environ['PATH']
         os.environ['PATH'] = os.environ['PATH'] + ':' + os.getcwd()
