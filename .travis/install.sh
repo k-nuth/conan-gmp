@@ -22,8 +22,8 @@ fi
 pip install conan --upgrade
 pip install conan_package_tools
 
-python -c "exec(\"import cpuid\\nprint(cpuid.cpu_microarchitecture())\")" || true
+# python -c "exec(\"import cpuid\\nprint(cpuid.cpu_microarchitecture())\")" || true
 pip install cpuid --upgrade
-python -c "exec(\"import cpuid\\nprint(cpuid.cpu_microarchitecture())\")" || true
+# python -c "exec(\"import cpuid\\nprint(cpuid.cpu_microarchitecture())\")" || true
 
 conan user

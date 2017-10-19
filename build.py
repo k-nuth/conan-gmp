@@ -25,19 +25,18 @@ if __name__ == "__main__":
             
             opt1 = copy.deepcopy(options)
             opt2 = copy.deepcopy(options)
+            opt3 = copy.deepcopy(options)
+            opt4 = copy.deepcopy(options)
 
             opt1["gmp:microarchitecture"] = "x86_64"
             opt2["gmp:microarchitecture"] = ''.join(cpuid.cpu_microarchitecture())
-
-            # print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-            # print(options)
-            # print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-            # print(opt1)
-            # print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-            # print(opt2)
+            opt3["gmp:microarchitecture"] = "haswell"
+            opt4["gmp:microarchitecture"] = "skylake"
 
             filtered_builds.append([settings, opt1, env_vars, build_requires])
             filtered_builds.append([settings, opt2, env_vars, build_requires])
+            filtered_builds.append([settings, opt3, env_vars, build_requires])
+            filtered_builds.append([settings, opt4, env_vars, build_requires])
 
     builder.builds = filtered_builds
 
