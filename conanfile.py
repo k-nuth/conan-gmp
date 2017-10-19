@@ -9,7 +9,10 @@ class BitprimGmpConan(ConanFile):
     version = "6.1.2"
     url = "https://github.com/bitprim/bitprim-conan-gmp"
     ZIP_FOLDER_NAME = "gmp-%s" % version
-    generators = "cmake"
+    
+    # generators = "cmake"
+    generators = "txt"
+
     settings =  "os", "compiler", "arch", "build_type"
     build_policy = "missing"
 
@@ -35,6 +38,11 @@ class BitprimGmpConan(ConanFile):
     requires = "m4/1.4.18@bitprim/stable"
 
     def source(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def source(self):")
+        print(options)
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        print(default_options)
+
         # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
         zip_name = "gmp-%s.tar.bz2" % self.version
         download("http://gmplib.org/download/gmp/%s" % zip_name, zip_name)
@@ -44,11 +52,24 @@ class BitprimGmpConan(ConanFile):
         unzip(zip_name)
         os.unlink(zip_name)
 
-    def config(self):
-        pass
-        # del self.settings.compiler.libcxx
+    # def config(self):
+    #     pass
+    #     # del self.settings.compiler.libcxx
 
-    def generic_env_configure_vars(self, verbose=False):
+
+    def configure(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def configure(self):")
+        print(options)
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        print(default_options)
+
+    def config_options(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def config_options(self):")
+        print(options)
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        print(default_options)
+
+    def _generic_env_configure_vars(self, verbose=False):
         """Reusable in any lib with configure!!"""
         command = ""
         if self.settings.os == "Linux" or self.settings.os == "Macos":
@@ -74,7 +95,7 @@ class BitprimGmpConan(ConanFile):
 
         return command
 
-    def determine_host(self):
+    def _determine_host(self):
         if self.settings.os == "Macos":
             # nehalem-apple-darwin15.6.0
             os_part = 'apple-darwin'
@@ -141,6 +162,10 @@ class BitprimGmpConan(ConanFile):
     #     #     host_string = " --build=%s --host=%s" % (self.options.host, self.options.host)
 
     def build(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def build(self):")
+        print(options)
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        print(default_options)
 
         old_path = os.environ['PATH']
         os.environ['PATH'] = os.environ['PATH'] + ':' + os.getcwd()
@@ -160,7 +185,7 @@ class BitprimGmpConan(ConanFile):
             config_options_string += " --with-pic"
 
 
-        host_string = self.determine_host()
+        host_string = self._determine_host()
         self.output.warn(host_string)
 
         disable_assembly = "--disable-assembly" if self.settings.arch == "x86" else ""
@@ -169,7 +194,7 @@ class BitprimGmpConan(ConanFile):
         # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure --with-pic --enable-static --enable-shared  --enable-cxx
         # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure  --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --with-pic --enable-static --enable-shared  --enable-cxx --host 
 
-        configure_command = "cd %s && %s ./configure %s --with-pic --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self.generic_env_configure_vars(), host_string, config_options_string, disable_assembly)
+        configure_command = "cd %s && %s ./configure %s --with-pic --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self._generic_env_configure_vars(), host_string, config_options_string, disable_assembly)
         self.output.warn(configure_command)
         self.run(configure_command)
 
@@ -183,9 +208,11 @@ class BitprimGmpConan(ConanFile):
         os.environ['PATH'] = old_path
 
     def imports(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def imports(self):")
         self.copy("m4", dst=".", src="bin")
 
     def package(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def package(self):")
         self.copy("*.h", "include", "%s" % (self.ZIP_FOLDER_NAME), keep_path=True)
         if self.options.shared:
             self.copy(pattern="*.so*", dst="lib", src=self.ZIP_FOLDER_NAME, keep_path=False)
@@ -196,6 +223,7 @@ class BitprimGmpConan(ConanFile):
         self.copy(pattern="*.lib", dst="lib", src="%s" % self.ZIP_FOLDER_NAME, keep_path=False)
         
     def package_info(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def package_info(self):")
         self.cpp_info.libs = ['gmp']
 
 
