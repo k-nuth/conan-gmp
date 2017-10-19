@@ -3,6 +3,7 @@ import os #, shutil
 from conans.tools import download, unzip #, replace_in_file, check_md5
 # from conans import CMake
 # from conans import tools
+import cpuid
 
 class BitprimGmpConan(ConanFile):
     name = "gmp"
@@ -32,27 +33,34 @@ class BitprimGmpConan(ConanFile):
                       "enable_cxx=True",  \
                       "disable-fft=False",  \
                       "enable-assert=False", \
-                      "microarchitecture=x86_64"
+                      "microarchitecture=_DUMMY_"
                     #   "host=generic"
 
+                    #   "microarchitecture=x86_64"
     requires = "m4/1.4.18@bitprim/stable"
 
-    def config_options(self):
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def config_options(self):")
+    # def config_options(self):
+    #     self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def config_options(self):")
+    #     # print(self.options)
+    #     # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+    #     # print(self.default_options)
+    #     # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+    #     self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
+    #     # del self.options.microarchitecture
+    #     # self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
+    #     print(cpuid.cpu_microarchitecture())
+
+    def configure(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def configure(self):")
         # print(self.options)
         # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
         # print(self.default_options)
         # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
         self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
-        del self.options.microarchitecture
-        self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
 
-    def configure(self):
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def configure(self):")
-        print(self.options)
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
-        print(self.default_options)
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-*")
+        if self.options.microarchitecture == "_DUMMY_":
+            self.options.microarchitecture = "%s%s" % cpuid.cpu_microarchitecture()
+
         self.output.warn("*** microarchitecture: %s" % (self.options.microarchitecture,))
 
     def source(self):
