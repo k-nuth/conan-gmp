@@ -105,6 +105,8 @@ class BitprimGmpConan(ConanFile):
             os_part = 'apple-darwin'
         elif self.settings.os == "Linux":
             os_part = 'pc-linux-gnu'
+        elif self.settings.os == "Windows" and self.settings.compiler == "gcc": #MinGW
+            os_part = 'pc-msys'
 
         complete_host = "%s-%s" % (self.options.microarchitecture, os_part)
         host_string = " --build=%s --host=%s" % (complete_host, complete_host)
