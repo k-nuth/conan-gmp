@@ -56,7 +56,8 @@ class BitprimGmpConan(ConanFile):
                       "enable-assert=False", \
                       "microarchitecture=_DUMMY_"
 
-    requires = "m4/1.4.18@bitprim/stable"
+    # requires = "m4/1.4.18@bitprim/stable"
+    build_requires = "m4/1.4.18@bitprim/stable"
 
     def configure(self):
         if self.options.microarchitecture == "_DUMMY_":
