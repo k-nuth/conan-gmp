@@ -64,6 +64,9 @@ class BitprimGmpConan(ConanFile):
             self.options.microarchitecture = get_cpu_microarchitecture()
         self.output.info("Compiling for microarchitecture: %s" % (self.options.microarchitecture,))
 
+        del self.settings.compiler.libcxx       #Pure-C Library
+
+
     def source(self):
         # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
         zip_name = "gmp-%s.tar.bz2" % self.version
@@ -232,6 +235,4 @@ class BitprimGmpConan(ConanFile):
     #     #     host_string = " --build=%s --host=%s" % (self.options.host, self.options.host)
 
 
-    # def config(self):
-    #     pass
-    #     # del self.settings.compiler.libcxx
+    
