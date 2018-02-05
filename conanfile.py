@@ -158,7 +158,7 @@ class BitprimGmpConan(ConanFile):
         config_options_string = ""
 
         for option_name in self.options.values.fields:
-            if option_name != 'microarchitecture':
+            if option_name != 'microarchitecture' and option_name != 'fPIC':
                 activated = getattr(self.options, option_name)
                 if activated:
                     self.output.info("Activated option! %s" % option_name)
@@ -166,8 +166,8 @@ class BitprimGmpConan(ConanFile):
 
         self.output.warn("*** Detected OS: %s" % (self.settings.os))
 
-        if self.settings.os == "Macos":
-            config_options_string += " --with-pic"
+        # if self.settings.os == "Macos":
+        #     config_options_string += " --with-pic"
 
 
         host_string = self._determine_host()
@@ -179,7 +179,16 @@ class BitprimGmpConan(ConanFile):
         # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure --with-pic --enable-static --enable-shared  --enable-cxx
         # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure  --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --with-pic --enable-static --enable-shared  --enable-cxx --host 
 
-        configure_command = "cd %s && %s ./configure %s --with-pic --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self._generic_env_configure_vars(), host_string, config_options_string, disable_assembly)
+        with_pic_str = "--with-pic" if self.fPIC_enabled else ""
+        
+        if self.is_shared:
+            shared_static_str = '--enable-shared'
+        else:
+            shared_static_str = '--enable-static'
+
+        # configure_command = "cd %s && %s ./configure %s %s --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self._generic_env_configure_vars(), host_string, with_pic_str, config_options_string, disable_assembly)
+        configure_command = "cd %s && %s ./configure %s %s %s %s %s" % (self.ZIP_FOLDER_NAME, self._generic_env_configure_vars(), host_string, with_pic_str, shared_static_str, config_options_string, disable_assembly)
+        
         self.output.warn(configure_command)
         self.run(configure_command)
 
