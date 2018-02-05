@@ -33,6 +33,9 @@ class BitprimGmpConan(ConanFile):
     url = "https://github.com/bitprim/bitprim-conan-gmp"
     ZIP_FOLDER_NAME = "gmp-%s" % version
     
+    description = "The GNU Multiple Precision Arithmetic Library"
+    license = "Dual licenses: GNU LGPL v3 and GNU GPL v2."
+    
     # generators = "cmake"
     generators = "txt"
 
