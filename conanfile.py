@@ -40,6 +40,7 @@ class BitprimGmpConan(ConanFile):
     build_policy = "missing"
 
     options = {"shared": [True, False],
+               "fPIC": [True, False]
                "disable_assembly": [True, False],
                "enable_fat": [True, False],
                "enable_cxx": [True, False],
@@ -49,6 +50,7 @@ class BitprimGmpConan(ConanFile):
               }
 
     default_options = "shared=False",  \
+                      "fPIC=True", \
                       "disable_assembly=False",  \
                       "enable_fat=False", \
                       "enable_cxx=True",  \
@@ -59,12 +61,39 @@ class BitprimGmpConan(ConanFile):
     # requires = "m4/1.4.18@bitprim/stable"
     build_requires = "m4/1.4.18@bitprim/stable"
 
+    @property
+    def msvc_mt_build(self):
+        return "MT" in str(self.settings.compiler.runtime)
+
+    @property
+    def fPIC_enabled(self):
+        if self.settings.compiler == "Visual Studio":
+            return False
+        else:
+            return self.options.fPIC
+
+    @property
+    def is_shared(self):
+        # if self.options.shared and self.msvc_mt_build:
+        if self.settings.compiler == "Visual Studio" and self.msvc_mt_build:
+            return False
+        else:
+            return self.options.shared
+
     def configure(self):
+        del self.settings.compiler.libcxx       #Pure-C Library
+
         if self.options.microarchitecture == "_DUMMY_":
             self.options.microarchitecture = get_cpu_microarchitecture()
         self.output.info("Compiling for microarchitecture: %s" % (self.options.microarchitecture,))
 
-        del self.settings.compiler.libcxx       #Pure-C Library
+    def config_options(self):
+        self.output.info('*-*-*-*-*-* def config_options(self):')
+        if self.settings.compiler == "Visual Studio":
+            self.options.remove("fPIC")
+
+            if self.options.shared and self.msvc_mt_build:
+                self.options.remove("shared")
 
 
     def source(self):
@@ -80,12 +109,15 @@ class BitprimGmpConan(ConanFile):
     def _generic_env_configure_vars(self, verbose=False):
         """Reusable in any lib with configure!!"""
         command = ""
+
+        fpic_str = "-fPIC" if self.fPIC_enabled else ""
+
         if self.settings.os == "Linux" or self.settings.os == "Macos":
             libs = 'LIBS="%s"' % " ".join(["-l%s" % lib for lib in self.deps_cpp_info.libs])
             ldflags = 'LDFLAGS="%s"' % " ".join(["-L%s" % lib for lib in self.deps_cpp_info.lib_paths])
             archflag = "-m32" if self.settings.arch == "x86" else ""
-            cflags = 'CFLAGS="-fPIC %s %s"' % (archflag, " ".join(self.deps_cpp_info.cflags))
-            cpp_flags = 'CPPFLAGS="-fPIC %s %s"' % (archflag, " ".join(self.deps_cpp_info.cppflags))
+            cflags = 'CFLAGS="%s %s %s"' % (fpic_str, archflag, " ".join(self.deps_cpp_info.cflags))
+            cpp_flags = 'CPPFLAGS="%s %s %s"' % (fpic_str, archflag, " ".join(self.deps_cpp_info.cppflags))
             command = "env %s %s %s %s" % (libs, ldflags, cflags, cpp_flags)
         elif self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
             cl_args = " ".join(['/I"%s"' % lib for lib in self.deps_cpp_info.include_paths])
@@ -97,8 +129,8 @@ class BitprimGmpConan(ConanFile):
             libs = 'LIBS="%s"' % " ".join(["-l%s" % lib for lib in self.deps_cpp_info.libs])
             ldflags = 'LDFLAGS="%s"' % " ".join(["-L%s" % lib for lib in self.deps_cpp_info.lib_paths])
             archflag = "-m32" if self.settings.arch == "x86" else ""
-            cflags = 'CFLAGS="-fPIC %s %s"' % (archflag, " ".join(self.deps_cpp_info.cflags))
-            cpp_flags = 'CPPFLAGS="-fPIC %s %s"' % (archflag, " ".join(self.deps_cpp_info.cppflags))
+            cflags = 'CFLAGS="%s %s %s"' % (fpic_str, archflag, " ".join(self.deps_cpp_info.cflags))
+            cpp_flags = 'CPPFLAGS="%s %s %s"' % (fpic_str, archflag, " ".join(self.deps_cpp_info.cppflags))
             command = "env %s %s %s %s" % (libs, ldflags, cflags, cpp_flags)
 
         return command
@@ -164,7 +196,7 @@ class BitprimGmpConan(ConanFile):
     def package(self):
         self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def package(self):")
         self.copy("*.h", "include", "%s" % (self.ZIP_FOLDER_NAME), keep_path=True)
-        if self.options.shared:
+        if self.is_shared:
             self.copy(pattern="*.so*", dst="lib", src=self.ZIP_FOLDER_NAME, keep_path=False)
             self.copy(pattern="*.dll*", dst="bin", src=self.ZIP_FOLDER_NAME, keep_path=False)
         else:
