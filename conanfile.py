@@ -40,7 +40,7 @@ class BitprimGmpConan(ConanFile):
     build_policy = "missing"
 
     options = {"shared": [True, False],
-               "fPIC": [True, False]
+               "fPIC": [True, False],
                "disable_assembly": [True, False],
                "enable_fat": [True, False],
                "enable_cxx": [True, False],
