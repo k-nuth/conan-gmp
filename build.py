@@ -34,7 +34,7 @@ if __name__ == "__main__":
                 and settings["arch"] == "x86_64" \
                 and not ("gmp:shared" in options and options["gmp:shared"]):
             
-            marchs = ["x86_64", ''.join(cpuid.cpu_microarchitecture()), "haswell", "skylake", "ivybridge"]
+            marchs = ["x86_64", ''.join(cpuid.cpu_microarchitecture()), "haswell", "skylake", "ivybridge", "sandybridge"]
             handle_microarchs("gmp:microarchitecture", marchs, filtered_builds, settings, options, env_vars, build_requires)
 
     builder.builds = filtered_builds
