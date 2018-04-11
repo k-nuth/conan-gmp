@@ -88,6 +88,11 @@ class BitprimGmpConan(ConanFile):
 
         if self.options.microarchitecture == "_DUMMY_":
             self.options.microarchitecture = get_cpu_microarchitecture()
+
+        if self.options.microarchitecture == "skylake-avx512":
+            self.output.info("'skylake-avx512' microarchitecture is not supported by GMP, fall back to 'skylake'")
+            self.options.microarchitecture = 'skylake'
+
         self.output.info("Compiling for microarchitecture: %s" % (self.options.microarchitecture,))
 
     def config_options(self):
@@ -108,14 +113,6 @@ class BitprimGmpConan(ConanFile):
         # check_md5(zip_name, "4c175f86e11eb32d8bf9872ca3a8e11d") #TODO
         unzip(zip_name)
         os.unlink(zip_name)
-
-    # def config(self):
-    #     pass
-    #     # del self.settings.compiler.libcxx
-
-    def configure(self):
-        if self.options.microarchitecture == "skylake-avx512":
-            self.options.microarchitecture = 'skylake'
 
     def _generic_env_configure_vars(self, verbose=False):
         """Reusable in any lib with configure!!"""
@@ -172,7 +169,7 @@ class BitprimGmpConan(ConanFile):
                     self.output.info("Activated option! %s" % option_name)
                     config_options_string += " --%s" % option_name.replace("_", "-")
 
-        self.output.warn("*** Detected OS: %s" % (self.settings.os))
+        self.output.info("*** Detected OS: %s" % (self.settings.os))
 
         # if self.settings.os == "Macos":
         #     config_options_string += " --with-pic"
@@ -197,7 +194,7 @@ class BitprimGmpConan(ConanFile):
         # configure_command = "cd %s && %s ./configure %s %s --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self._generic_env_configure_vars(), host_string, with_pic_str, config_options_string, disable_assembly)
         configure_command = "cd %s && %s ./configure %s %s %s %s %s" % (self.ZIP_FOLDER_NAME, self._generic_env_configure_vars(), host_string, with_pic_str, shared_static_str, config_options_string, disable_assembly)
         
-        self.output.warn(configure_command)
+        self.output.info(configure_command)
         self.run(configure_command)
 
         # if self.settings.os == "Linux" or self.settings.os == "Macos":
@@ -210,11 +207,11 @@ class BitprimGmpConan(ConanFile):
         os.environ['PATH'] = old_path
 
     def imports(self):
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def imports(self):")
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def imports(self):")
         self.copy("m4", dst=".", src="bin")
 
     def package(self):
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def package(self):")
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def package(self):")
         self.copy("*.h", "include", "%s" % (self.ZIP_FOLDER_NAME), keep_path=True)
         if self.is_shared:
             self.copy(pattern="*.so*", dst="lib", src=self.ZIP_FOLDER_NAME, keep_path=False)
@@ -225,7 +222,7 @@ class BitprimGmpConan(ConanFile):
         self.copy(pattern="*.lib", dst="lib", src="%s" % self.ZIP_FOLDER_NAME, keep_path=False)
         
     def package_info(self):
-        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def package_info(self):")
+        # self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def package_info(self):")
         self.cpp_info.libs = ['gmp']
 
 
