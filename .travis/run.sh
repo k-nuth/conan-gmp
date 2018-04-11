@@ -10,4 +10,6 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
     pyenv activate conan
 fi
 
+# python -c "exec(\"import cpuid\\nprint(cpuid.cpu_microarchitecture())\")" || true
+
 python build.py

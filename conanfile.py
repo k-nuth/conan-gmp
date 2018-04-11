@@ -3,36 +3,101 @@ import os #, shutil
 from conans.tools import download, unzip #, replace_in_file, check_md5
 # from conans import CMake
 # from conans import tools
+import importlib
+
+
+microarchitecture_default = 'x86_64'
+
+def get_cpuid():
+    try:
+        cpuid = importlib.import_module('cpuid')
+        return cpuid
+    except ImportError:
+        # print("*** cpuid could not be imported")
+        return None
+
+def get_cpu_microarchitecture_or_default(default):
+    cpuid = get_cpuid()
+    if cpuid != None:
+        return '%s%s' % cpuid.cpu_microarchitecture()
+    else:
+        return default
+
+def get_cpu_microarchitecture():
+    return get_cpu_microarchitecture_or_default(microarchitecture_default)
+
 
 class BitprimGmpConan(ConanFile):
     name = "gmp"
     version = "6.1.2"
     url = "https://github.com/bitprim/bitprim-conan-gmp"
     ZIP_FOLDER_NAME = "gmp-%s" % version
-    generators = "cmake"
+    
+    description = "The GNU Multiple Precision Arithmetic Library"
+    license = "Dual licenses: GNU LGPL v3 and GNU GPL v2."
+    
+    # generators = "cmake"
+    generators = "txt"
+
     settings =  "os", "compiler", "arch", "build_type"
     build_policy = "missing"
 
     options = {"shared": [True, False],
+               "fPIC": [True, False],
                "disable_assembly": [True, False],
                "enable_fat": [True, False],
                "enable_cxx": [True, False],
                "disable-fft": [True, False],
                "enable-assert": [True, False],
                "microarchitecture": "ANY" #["x86_64", "haswell", "ivybridge", "sandybridge", "bulldozer", ...]
-            #    "host": "ANY" #["auto", "generic", "haswell", "ivybridge", "sandybridge", ...]
               }
 
     default_options = "shared=False",  \
+                      "fPIC=True", \
                       "disable_assembly=False",  \
                       "enable_fat=False", \
                       "enable_cxx=True",  \
                       "disable-fft=False",  \
                       "enable-assert=False", \
-                      "microarchitecture=x86_64"
-                    #   "host=generic"
+                      "microarchitecture=_DUMMY_"
 
-    requires = "m4/1.4.18@bitprim/stable"
+    # requires = "m4/1.4.18@bitprim/stable"
+    build_requires = "m4/1.4.18@bitprim/stable"
+
+    @property
+    def msvc_mt_build(self):
+        return "MT" in str(self.settings.compiler.runtime)
+
+    @property
+    def fPIC_enabled(self):
+        if self.settings.compiler == "Visual Studio":
+            return False
+        else:
+            return self.options.fPIC
+
+    @property
+    def is_shared(self):
+        # if self.options.shared and self.msvc_mt_build:
+        if self.settings.compiler == "Visual Studio" and self.msvc_mt_build:
+            return False
+        else:
+            return self.options.shared
+
+    def configure(self):
+        del self.settings.compiler.libcxx       #Pure-C Library
+
+        if self.options.microarchitecture == "_DUMMY_":
+            self.options.microarchitecture = get_cpu_microarchitecture()
+        self.output.info("Compiling for microarchitecture: %s" % (self.options.microarchitecture,))
+
+    def config_options(self):
+        self.output.info('*-*-*-*-*-* def config_options(self):')
+        if self.settings.compiler == "Visual Studio":
+            self.options.remove("fPIC")
+
+            if self.options.shared and self.msvc_mt_build:
+                self.options.remove("shared")
+
 
     def source(self):
         # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
@@ -52,15 +117,18 @@ class BitprimGmpConan(ConanFile):
         if self.options.microarchitecture == "skylake-avx512":
             self.options.microarchitecture = 'skylake'
 
-    def generic_env_configure_vars(self, verbose=False):
+    def _generic_env_configure_vars(self, verbose=False):
         """Reusable in any lib with configure!!"""
         command = ""
+
+        fpic_str = "-fPIC" if self.fPIC_enabled else ""
+
         if self.settings.os == "Linux" or self.settings.os == "Macos":
             libs = 'LIBS="%s"' % " ".join(["-l%s" % lib for lib in self.deps_cpp_info.libs])
             ldflags = 'LDFLAGS="%s"' % " ".join(["-L%s" % lib for lib in self.deps_cpp_info.lib_paths])
             archflag = "-m32" if self.settings.arch == "x86" else ""
-            cflags = 'CFLAGS="-fPIC %s %s"' % (archflag, " ".join(self.deps_cpp_info.cflags))
-            cpp_flags = 'CPPFLAGS="-fPIC %s %s"' % (archflag, " ".join(self.deps_cpp_info.cppflags))
+            cflags = 'CFLAGS="%s %s %s"' % (fpic_str, archflag, " ".join(self.deps_cpp_info.cflags))
+            cpp_flags = 'CPPFLAGS="%s %s %s"' % (fpic_str, archflag, " ".join(self.deps_cpp_info.cppflags))
             command = "env %s %s %s %s" % (libs, ldflags, cflags, cpp_flags)
         elif self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
             cl_args = " ".join(['/I"%s"' % lib for lib in self.deps_cpp_info.include_paths])
@@ -72,22 +140,96 @@ class BitprimGmpConan(ConanFile):
             libs = 'LIBS="%s"' % " ".join(["-l%s" % lib for lib in self.deps_cpp_info.libs])
             ldflags = 'LDFLAGS="%s"' % " ".join(["-L%s" % lib for lib in self.deps_cpp_info.lib_paths])
             archflag = "-m32" if self.settings.arch == "x86" else ""
-            cflags = 'CFLAGS="-fPIC %s %s"' % (archflag, " ".join(self.deps_cpp_info.cflags))
-            cpp_flags = 'CPPFLAGS="-fPIC %s %s"' % (archflag, " ".join(self.deps_cpp_info.cppflags))
+            cflags = 'CFLAGS="%s %s %s"' % (fpic_str, archflag, " ".join(self.deps_cpp_info.cflags))
+            cpp_flags = 'CPPFLAGS="%s %s %s"' % (fpic_str, archflag, " ".join(self.deps_cpp_info.cppflags))
             command = "env %s %s %s %s" % (libs, ldflags, cflags, cpp_flags)
 
         return command
 
-    def determine_host(self):
+    def _determine_host(self):
         if self.settings.os == "Macos":
             # nehalem-apple-darwin15.6.0
             os_part = 'apple-darwin'
         elif self.settings.os == "Linux":
             os_part = 'pc-linux-gnu'
+        elif self.settings.os == "Windows" and self.settings.compiler == "gcc": #MinGW
+            os_part = 'pc-msys'
 
         complete_host = "%s-%s" % (self.options.microarchitecture, os_part)
         host_string = " --build=%s --host=%s" % (complete_host, complete_host)
         return host_string
+
+    def build(self):
+        old_path = os.environ['PATH']
+        os.environ['PATH'] = os.environ['PATH'] + ':' + os.getcwd()
+
+        config_options_string = ""
+
+        for option_name in self.options.values.fields:
+            if option_name != 'microarchitecture' and option_name != 'fPIC':
+                activated = getattr(self.options, option_name)
+                if activated:
+                    self.output.info("Activated option! %s" % option_name)
+                    config_options_string += " --%s" % option_name.replace("_", "-")
+
+        self.output.warn("*** Detected OS: %s" % (self.settings.os))
+
+        # if self.settings.os == "Macos":
+        #     config_options_string += " --with-pic"
+
+
+        host_string = self._determine_host()
+        self.output.warn(host_string)
+
+        disable_assembly = "--disable-assembly" if self.settings.arch == "x86" else ""
+
+        # ./configure --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --program-prefix= --disable-dependency-tracking --enable-cxx
+        # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure --with-pic --enable-static --enable-shared  --enable-cxx
+        # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure  --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --with-pic --enable-static --enable-shared  --enable-cxx --host 
+
+        with_pic_str = "--with-pic" if self.fPIC_enabled else ""
+        
+        if self.is_shared:
+            shared_static_str = '--enable-shared'
+        else:
+            shared_static_str = '--enable-static'
+
+        # configure_command = "cd %s && %s ./configure %s %s --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self._generic_env_configure_vars(), host_string, with_pic_str, config_options_string, disable_assembly)
+        configure_command = "cd %s && %s ./configure %s %s %s %s %s" % (self.ZIP_FOLDER_NAME, self._generic_env_configure_vars(), host_string, with_pic_str, shared_static_str, config_options_string, disable_assembly)
+        
+        self.output.warn(configure_command)
+        self.run(configure_command)
+
+        # if self.settings.os == "Linux" or self.settings.os == "Macos":
+        if self.settings.os != "Windows":
+            self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
+        else:
+            # self.run("dir C:\MinGw\bin\")
+            self.run("cd %s && C:/MinGw/bin/make" % self.ZIP_FOLDER_NAME)
+
+        os.environ['PATH'] = old_path
+
+    def imports(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def imports(self):")
+        self.copy("m4", dst=".", src="bin")
+
+    def package(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def package(self):")
+        self.copy("*.h", "include", "%s" % (self.ZIP_FOLDER_NAME), keep_path=True)
+        if self.is_shared:
+            self.copy(pattern="*.so*", dst="lib", src=self.ZIP_FOLDER_NAME, keep_path=False)
+            self.copy(pattern="*.dll*", dst="bin", src=self.ZIP_FOLDER_NAME, keep_path=False)
+        else:
+            self.copy(pattern="*.a", dst="lib", src="%s" % self.ZIP_FOLDER_NAME, keep_path=False)
+
+        self.copy(pattern="*.lib", dst="lib", src="%s" % self.ZIP_FOLDER_NAME, keep_path=False)
+        
+    def package_info(self):
+        self.output.warn("-*-*-*-*-*-*-*-*-*-*-*-* def package_info(self):")
+        self.cpp_info.libs = ['gmp']
+
+
+
 
 
     # def determine_microarch(self):
@@ -144,62 +286,5 @@ class BitprimGmpConan(ConanFile):
     #     # else:
     #     #     host_string = " --build=%s --host=%s" % (self.options.host, self.options.host)
 
-    def build(self):
 
-        old_path = os.environ['PATH']
-        os.environ['PATH'] = os.environ['PATH'] + ':' + os.getcwd()
-
-        config_options_string = ""
-
-        for option_name in self.options.values.fields:
-            if option_name != 'microarchitecture':
-                activated = getattr(self.options, option_name)
-                if activated:
-                    self.output.info("Activated option! %s" % option_name)
-                    config_options_string += " --%s" % option_name.replace("_", "-")
-
-        self.output.warn("*** Detected OS: %s" % (self.settings.os))
-
-        if self.settings.os == "Macos":
-            config_options_string += " --with-pic"
-
-
-        host_string = self.determine_host()
-        self.output.warn(host_string)
-
-        disable_assembly = "--disable-assembly" if self.settings.arch == "x86" else ""
-
-        # ./configure --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --program-prefix= --disable-dependency-tracking --enable-cxx
-        # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure --with-pic --enable-static --enable-shared  --enable-cxx
-        # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure  --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --with-pic --enable-static --enable-shared  --enable-cxx --host 
-
-        configure_command = "cd %s && %s ./configure %s --with-pic --enable-static --enable-shared %s %s" % (self.ZIP_FOLDER_NAME, self.generic_env_configure_vars(), host_string, config_options_string, disable_assembly)
-        self.output.warn(configure_command)
-        self.run(configure_command)
-
-        # if self.settings.os == "Linux" or self.settings.os == "Macos":
-        if self.settings.os != "Windows":
-            self.run("cd %s && make" % self.ZIP_FOLDER_NAME)
-        else:
-            # self.run("dir C:\MinGw\bin\")
-            self.run("cd %s && C:/MinGw/bin/make" % self.ZIP_FOLDER_NAME)
-
-        os.environ['PATH'] = old_path
-
-    def imports(self):
-        self.copy("m4", dst=".", src="bin")
-
-    def package(self):
-        self.copy("*.h", "include", "%s" % (self.ZIP_FOLDER_NAME), keep_path=True)
-        if self.options.shared:
-            self.copy(pattern="*.so*", dst="lib", src=self.ZIP_FOLDER_NAME, keep_path=False)
-            self.copy(pattern="*.dll*", dst="bin", src=self.ZIP_FOLDER_NAME, keep_path=False)
-        else:
-            self.copy(pattern="*.a", dst="lib", src="%s" % self.ZIP_FOLDER_NAME, keep_path=False)
-
-        self.copy(pattern="*.lib", dst="lib", src="%s" % self.ZIP_FOLDER_NAME, keep_path=False)
-        
-    def package_info(self):
-        self.cpp_info.libs = ['gmp']
-
-
+    

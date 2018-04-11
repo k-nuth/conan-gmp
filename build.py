@@ -4,6 +4,17 @@ import os
 import cpuid
 import copy
 
+
+def handle_microarchs(opt_name, microarchs, filtered_builds, settings, options, env_vars, build_requires):
+    # print(microarchs)
+    microarchs = list(set(microarchs))
+    # print(microarchs)
+
+    for ma in microarchs:
+        opts_copy = copy.deepcopy(options)
+        opts_copy[opt_name] = ma
+        filtered_builds.append([settings, opts_copy, env_vars, build_requires])
+
 if __name__ == "__main__":
 
     # print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
@@ -23,21 +34,8 @@ if __name__ == "__main__":
                 and settings["arch"] == "x86_64" \
                 and not ("gmp:shared" in options and options["gmp:shared"]):
             
-            opt1 = copy.deepcopy(options)
-            opt2 = copy.deepcopy(options)
-
-            opt1["gmp:microarchitecture"] = "x86_64"
-            opt2["gmp:microarchitecture"] = ''.join(cpuid.cpu_microarchitecture())
-
-            print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-            print(options)
-            print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-            print(opt1)
-            print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-            print(opt2)
-
-            filtered_builds.append([settings, opt1, env_vars, build_requires])
-            filtered_builds.append([settings, opt2, env_vars, build_requires])
+            marchs = ["x86_64", ''.join(cpuid.cpu_microarchitecture()), "haswell", "skylake", "ivybridge", "sandybridge"]
+            handle_microarchs("gmp:microarchitecture", marchs, filtered_builds, settings, options, env_vars, build_requires)
 
     builder.builds = filtered_builds
 
