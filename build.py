@@ -6,11 +6,11 @@ import copy
 
 if __name__ == "__main__":
 
-    print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-    print(cpuid.cpu_vendor())
-    print(cpuid.cpu_name())
-    print(cpuid.cpu_microarchitecture())
-    print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
+    # print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
+    # print(cpuid.cpu_vendor())
+    # print(cpuid.cpu_name())
+    # print(cpuid.cpu_microarchitecture())
+    # print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
 
     builder = ConanMultiPackager(username="bitprim", channel="stable",
                                  remotes="https://api.bintray.com/conan/bitprim/bitprim")

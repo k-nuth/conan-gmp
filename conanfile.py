@@ -44,9 +44,13 @@ class BitprimGmpConan(ConanFile):
         unzip(zip_name)
         os.unlink(zip_name)
 
-    def config(self):
-        pass
-        # del self.settings.compiler.libcxx
+    # def config(self):
+    #     pass
+    #     # del self.settings.compiler.libcxx
+
+    def configure(self):
+        if self.options.microarchitecture == "skylake-avx512":
+            self.options.microarchitecture = 'skylake'
 
     def generic_env_configure_vars(self, verbose=False):
         """Reusable in any lib with configure!!"""
