@@ -96,7 +96,7 @@ class BitprimGmpConan(ConanFile):
         self.output.info("Compiling for microarchitecture: %s" % (self.options.microarchitecture,))
 
     def config_options(self):
-        self.output.info('*-*-*-*-*-* def config_options(self):')
+        # self.output.info('*-*-*-*-*-* def config_options(self):')
         if self.settings.compiler == "Visual Studio":
             self.options.remove("fPIC")
 
