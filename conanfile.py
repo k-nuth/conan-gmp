@@ -113,6 +113,7 @@ class BitprimGmpConan(ConanFile):
     #     pass
     #     # del self.settings.compiler.libcxx
 
+
     def configure(self):
         if self.options.microarchitecture == "skylake-avx512":
             self.options.microarchitecture = 'skylake'
