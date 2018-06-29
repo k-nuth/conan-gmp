@@ -84,6 +84,8 @@ class BitprimGmpConan(ConanFile):
             return self.options.shared
 
     def configure(self):
+        # self.output.info("********************************** configure(self) self.options.microarchitecture: %s" % (self.options.microarchitecture,))
+
         del self.settings.compiler.libcxx       #Pure-C Library
 
         if self.options.microarchitecture == "_DUMMY_":
@@ -96,7 +98,7 @@ class BitprimGmpConan(ConanFile):
         self.output.info("Compiling for microarchitecture: %s" % (self.options.microarchitecture,))
 
     def config_options(self):
-        # self.output.info('*-*-*-*-*-* def config_options(self):')
+        # self.output.info("********************************** config_options(self) self.options.microarchitecture: %s" % (self.options.microarchitecture,))
         if self.settings.compiler == "Visual Studio":
             self.options.remove("fPIC")
 
@@ -105,6 +107,8 @@ class BitprimGmpConan(ConanFile):
 
 
     def source(self):
+        # self.output.info("********************************** source(self) self.options.microarchitecture: %s" % (self.options.microarchitecture,))
+
         # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
         zip_name = "gmp-%s.tar.bz2" % self.version
         download("http://gmplib.org/download/gmp/%s" % zip_name, zip_name)
@@ -119,9 +123,6 @@ class BitprimGmpConan(ConanFile):
     #     # del self.settings.compiler.libcxx
 
 
-    def configure(self):
-        if self.options.microarchitecture == "skylake-avx512":
-            self.options.microarchitecture = 'skylake'
 
     def _generic_env_configure_vars(self, verbose=False):
         """Reusable in any lib with configure!!"""
