@@ -26,6 +26,78 @@ def get_cpu_microarchitecture_or_default(default):
 def get_cpu_microarchitecture():
     return get_cpu_microarchitecture_or_default(microarchitecture_default)
 
+# athlon64 | atom | silvermont | goldmont | core2 | corei* | opteron | k[89] | k10 | bobcat | jaguar* | bulldozer* | piledriver* | steamroller* | excavator* | nano | nehalem* | westmere* | sandybridge* | ivybridge* | haswell* | broadwell* | skylake* | kabylake* | knightslanding)
+#   test_cpu=x86_64 ;;
+
+
+gmp_aliases = {
+    'x86-64':            'x86_64',
+
+# Intel Core
+    'core2':             'core2',
+    'nehalem':           'nehalem',
+    'westmere':          'westmere',
+    'sandybridge':       'sandybridge',
+    'ivybridge':         'ivybridge',      
+    'haswell':           'haswell',        
+    'broadwell':         'broadwell',      
+    'skylake':           'skylake',        
+    'skylake-avx512':    'skylake', 
+    'kabylake':          'kabylake', 
+    # Coffee Lake
+    # Whiskey Lake
+    # Cascade Lake
+    'cannonlake':        'kabylake', 
+    'icelake-client':    'kabylake', 
+    'icelake-server':    'kabylake', 
+    # Tiger Lake
+    # Sapphire Rapids
+
+# Intel Atom
+    'bonnell':           'atom',
+    'silvermont':        'silvermont',
+    'goldmont':          'goldmont',
+    'goldmont-plus':     'goldmont',
+    'tremont':           'goldmont',
+
+# Intel High-end
+    'knl':               'knightslanding',
+    'knm':               'knightslanding',
+
+# AMD
+    'k8':                'k8',
+    'opteron':           'opteron',
+    'athlon64':          'athlon64',      
+    'athlon-fx':         'athlon64',
+    'k8-sse3':           'k8',          #k9?
+    'opteron-sse3':      'opteron',     #k9?
+    'athlon64-sse3':     'athlon64',    #k9?
+    'amdfam10':          'k10',
+    'barcelona':         'k10',
+    'btver1':            'bobcat',
+    'btver2':            'jaguar',
+    'bdver1':            'bulldozer',
+    'bdver2':            'piledriver',
+    'bdver3':            'steamroller',
+    'bdver4':            'excavator',
+    'znver1':            'excavator',
+
+# VIA
+    'nano':           'nano',
+    'nano-1000':      'nano',
+    'nano-2000':      'nano',
+    'nano-3000':      'nano',
+    'nano-x2':        'nano',
+    'nano-x4':        'nano',
+}
+
+
+def translate_alias(alias):
+    alias_str = str(alias)
+    if alias_str in gmp_aliases:
+        return gmp_aliases[alias_str]
+    else:
+        return alias
 
 class BitprimGmpConan(ConanFile):
     name = "gmp"
@@ -84,21 +156,31 @@ class BitprimGmpConan(ConanFile):
             return self.options.shared
 
     def configure(self):
-        # self.output.info("********************************** configure(self) self.options.microarchitecture: %s" % (self.options.microarchitecture,))
-
         del self.settings.compiler.libcxx       #Pure-C Library
 
         if self.options.microarchitecture == "_DUMMY_":
-            self.options.microarchitecture = get_cpu_microarchitecture()
+            self.options.microarchitecture = get_cpu_microarchitecture().replace('_', '-')
+            if get_cpuid() == None:
+                march_from = 'default'
+            else:
+                march_from = 'taken from cpuid'
+        else:
+            march_from = 'user defined'
 
-        if self.options.microarchitecture == "skylake-avx512":
-            self.output.info("'skylake-avx512' microarchitecture is not supported by GMP, fall back to 'skylake'")
-            self.options.microarchitecture = 'skylake'
+        new_march = translate_alias(self.options.microarchitecture)
 
-        self.output.info("Compiling for microarchitecture: %s" % (self.options.microarchitecture,))
+        self.output.error(str(new_march))
+
+        if march_from == 'user defined':
+            self.output.info("Provided microarchitecture (%s): %s" % (march_from, self.options.microarchitecture))
+        else:
+            self.output.info("Detected microarchitecture (%s): %s" % (march_from, self.options.microarchitecture))
+
+        if self.options.microarchitecture != new_march:
+            self.options.microarchitecture = new_march
+            self.output.info("Corrected microarchitecture: %s" % (self.options.microarchitecture,))
 
     def config_options(self):
-        # self.output.info("********************************** config_options(self) self.options.microarchitecture: %s" % (self.options.microarchitecture,))
         if self.settings.compiler == "Visual Studio":
             self.options.remove("fPIC")
 
@@ -107,8 +189,6 @@ class BitprimGmpConan(ConanFile):
 
 
     def source(self):
-        # self.output.info("********************************** source(self) self.options.microarchitecture: %s" % (self.options.microarchitecture,))
-
         # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
         zip_name = "gmp-%s.tar.bz2" % self.version
         download("http://gmplib.org/download/gmp/%s" % zip_name, zip_name)

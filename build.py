@@ -16,13 +16,6 @@ def handle_microarchs(opt_name, microarchs, filtered_builds, settings, options, 
         filtered_builds.append([settings, opts_copy, env_vars, build_requires])
 
 if __name__ == "__main__":
-
-    # print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-    # print(cpuid.cpu_vendor())
-    # print(cpuid.cpu_name())
-    # print(cpuid.cpu_microarchitecture())
-    # print('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-
     builder = ConanMultiPackager(username="bitprim", channel="stable",
                                  remotes="https://api.bintray.com/conan/bitprim/bitprim")
     builder.add_common_builds(shared_option_name="gmp:shared", pure_c=True)
