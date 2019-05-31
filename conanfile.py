@@ -99,10 +99,10 @@ def translate_alias(alias):
     else:
         return alias
 
-class BitprimGmpConan(ConanFile):
+class KthGmpConan(ConanFile):
     name = "gmp"
     version = "6.1.2"
-    url = "https://github.com/bitprim/bitprim-conan-gmp"
+    url = "https://github.comk-nuth/kth-conan-gmp"
     ZIP_FOLDER_NAME = "gmp-%s" % version
     
     description = "The GNU Multiple Precision Arithmetic Library"

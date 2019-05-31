@@ -2,10 +2,10 @@
 env:
    global:
      - CONAN_REFERENCE: "gmp/6.1.2"
-     - CONAN_USERNAME: "bitprim"
-     - CONAN_LOGIN_USERNAME: "bitprim-bintray"
+     - CONAN_USERNAME: "kth"
+     - CONAN_LOGIN_USERNAME: "fpelliccioni"
      - CONAN_CHANNEL: "stable"
-     - CONAN_UPLOAD: "https://api.bintray.com/conan/bitprim/bitprim"
+     - CONAN_UPLOAD: "https://api.bintray.com/conan/k-nuth/kth"
      - CONAN_STABLE_BRANCH_PATTERN: "release/*"
 
 linux: &linux
