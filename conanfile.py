@@ -102,7 +102,7 @@ def translate_alias(alias):
 class KthGmpConan(ConanFile):
     name = "gmp"
     version = "6.1.2"
-    url = "https://github.comk-nuth/kth-conan-gmp"
+    url = "https://github.com/k-nuth/kth-conan-gmp"
     ZIP_FOLDER_NAME = "gmp-%s" % version
     
     description = "The GNU Multiple Precision Arithmetic Library"
