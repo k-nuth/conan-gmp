@@ -9,7 +9,7 @@ cirrus_gcc_test_task:
   #     STDFLAG: -std=c++17
   #     STDFLAG: -std=c++2a
   # version_script: make -C test showcxxversion
-  build_script: apt install python-dev && wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && chmod +x .travis/install.sh && chmod +x .travis/run.sh && ./.travis/install.sh && ./.travis/run.sh
+  build_script: apt install python2.7-dev && wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && chmod +x .travis/install.sh && chmod +x .travis/run.sh && ./.travis/install.sh && ./.travis/run.sh
   # test_script: wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && chmod +x .travis/install.sh && chmod +x .travis/run.sh && ./.travis/install.sh && ./.travis/run.sh
 
 
