@@ -1,4 +1,24 @@
-container:
-  image: gcc:latest
-task:
-  tests_script: make tests
+cirrus_gcc_test_task:
+  only_if: &default-condition $CIRRUS_BRANCH == 'master' || $CIRRUS_BRANCH == 'dev' || $CIRRUS_BRANCH =~ 'feature-.*' || $CIRRUS_BRANCH =~ 'feature_.*' || $CIRRUS_BRANCH =~ 'cirrusci/.*' || $CIRRUS_BASE_BRANCH != ''
+  auto_cancellation: true
+  container:
+    image: gcc:latest
+  # env:
+  #   matrix:
+  #     STDFLAG: -std=c++14
+  #     STDFLAG: -std=c++17
+  #     STDFLAG: -std=c++2a
+  version_script: make -C test showcxxversion
+  test_script: chmod +x .travis/install.sh && chmod +x .travis/run.sh && ./.travis/install.sh && ./.travis/run.sh
+
+# container:
+#   image: gcc:latest
+# task:
+#   tests_script: make tests
+
+
+
+
+
+
+
