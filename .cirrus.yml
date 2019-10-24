@@ -64,7 +64,7 @@ cirrus_freebsd_clang_test_task:
 
     - freebsd-version
     - which python
-    - ln -s /usr/local/bin/python3.6 /usr/local/bin/python
+    # - ln -s /usr/local/bin/python3.6 /usr/local/bin/python
     - python --version
     - pkg install py36-pip
     - which pip-3.6
