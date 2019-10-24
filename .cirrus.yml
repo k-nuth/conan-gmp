@@ -8,7 +8,7 @@ cirrus_gcc_test_task:
   #     STDFLAG: -std=c++14
   #     STDFLAG: -std=c++17
   #     STDFLAG: -std=c++2a
-  version_script: make -C test showcxxversion
+  # version_script: make -C test showcxxversion
   test_script: chmod +x .travis/install.sh && chmod +x .travis/run.sh && ./.travis/install.sh && ./.travis/run.sh
 
 # container:
