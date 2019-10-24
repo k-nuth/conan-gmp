@@ -16,6 +16,8 @@ cirrus_gcc_test_task:
     CONAN_CHANNEL: "stable"
     CONAN_UPLOAD: "https://api.bintray.com/conan/k-nuth/kth"
     CONAN_STABLE_BRANCH_PATTERN: "release/*"
+    CONAN_LOGIN_USERNAME: ENCRYPTED[!0fc5affed4d2084389c1cb0cfa369767e679a054d8e418dcf98c4d25d34b6bec6a5e3dd0235f3dd66686c1739d7bfbcc!]
+    CONAN_PASSWORD: ENCRYPTED[!3ed4d8bb7c72f35dc679f44fa521616f928c7286fa0d84195c3b1cd7c058e0154085f9b8dd8e57268c4e7a343eb34a18!]
 
   # version_script: make -C test showcxxversion
   install_script:
