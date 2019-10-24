@@ -35,7 +35,7 @@ cirrus_gcc_test_task:
 
 cirrus_freebsd_clang_test_task:
   freebsd_instance:
-    image: freebsd-12-0
+    image: freebsd-12-0-release-amd64
     # freebsd-11-2-release-amd64
   env:
     CONAN_GCC_VERSIONS: 9
