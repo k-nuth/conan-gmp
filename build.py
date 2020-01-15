@@ -4,11 +4,17 @@ import os
 import cpuid
 import copy
 
+print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
+print(cpuid.cpu_microarchitecture())
+print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 
 def handle_microarchs(opt_name, microarchs, filtered_builds, settings, options, env_vars, build_requires):
-    # print(microarchs)
+    print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
+    print(microarchs)
+    print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
     microarchs = list(set(microarchs))
-    # print(microarchs)
+    print(microarchs)
+    print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 
     for ma in microarchs:
         opts_copy = copy.deepcopy(options)
@@ -21,8 +27,13 @@ if __name__ == "__main__":
     builder.add_common_builds(shared_option_name="gmp:shared", pure_c=True)
     builder.password = os.getenv("CONAN_PASSWORD")
 
+    print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
+    print(len(builder.items))
+    print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
+
     filtered_builds = []
-    for settings, options, env_vars, build_requires in builder.builds:
+    # for settings, options, env_vars, build_requires in builder.builds:
+    for settings, options, env_vars, build_requires, reference in builder.items:
         if settings["build_type"] == "Release" \
                 and settings["arch"] == "x86_64" \
                 and not ("gmp:shared" in options and options["gmp:shared"]):

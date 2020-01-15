@@ -1,10 +1,14 @@
 # ------------------------------------------------------------------------------------------
 cirrus_freebsd_clang_test_task:
+  only_if: &default-condition $CIRRUS_BRANCH == 'master' || $CIRRUS_BRANCH == 'dev' || $CIRRUS_BRANCH =~ 'feature-.*' || $CIRRUS_BRANCH =~ 'feature_.*' || $CIRRUS_BRANCH =~ 'cirrusci/.*' || $CIRRUS_BRANCH == 'cirrus-ci-tests' || $CIRRUS_BASE_BRANCH != ''
+  auto_cancellation: true
+
   freebsd_instance:
     image: freebsd-12-0-release-amd64
     # freebsd-11-2-release-amd64
   env:
-    CONAN_GCC_VERSIONS: 9
+    # CONAN_GCC_VERSIONS: 9
+    CONAN_CLANG_VERSIONS: "7.0, 6.0"
     CONAN_REFERENCE: "gmp/6.1.2"
     CONAN_USERNAME: "kth"
     CONAN_LOGIN_USERNAME: "fpelliccioni"
@@ -28,25 +32,49 @@ cirrus_freebsd_clang_test_task:
     # - chmod +x .travis/run.sh 
     # - ./.travis/install.sh
 
-    # - set -e
-    # - set -x
+    - set -e
+    - set -x
+
+
 
     - freebsd-version
+
+    - echo "Git installation..."
+    - pkg update -f
+    - pkg install -y git
+    - which git
+    - git --version
+
+
     - which python
     # - ln -s /usr/local/bin/python3.6 /usr/local/bin/python
     - python --version
-    - pkg install -y py36-pip
-    - which pip-3.6
-    - pip install --upgrade pip
+
+    # - pkg install -y py36-pip
+    # - which pip-3.6
+    - pkg install -y py27-pip
+    - which pip-2.7
+    - ln -s /usr/local/bin/pip-2.7 /usr/local/bin/pip
+    - pip --version
+
+    # - pip install --upgrade pip
 
     - pip install conan --upgrade
-    - pip install conan_package_tools
+    - pip install conan_package_tools --upgrade
     - pip install cpuid --upgrade
+
+    # - echo "fix Conan"
+    # - cd /usr/ports/databases/py-sqlite3
+    # - make clean
+    # - sudo make PYTHON_VERSION=python2.7 install
+
     - conan user
 
   build_script:
     # - ./.travis/run.sh
-    python build.py
+    - pwd
+    - ls -ltra
+    - python build.py
 
 
 

@@ -1,0 +1,63 @@
+FreeBSD setup
+===============================================================
+
+- Enable SSH
+    - Create a new user for using the SSH: `adduser`
+    - Agregar al usuario creado al grupo `wheel`:   `pw group mod wheel -m fernando`
+    vi /etc/rc.conf
+        `sshd_enable="YES"`
+    /etc/rc.d/sshd start
+
+- Agregar al usuario al archivo de sudoers
+    su
+    visudo
+        "fernando ALL=(ALL) ALL"
+
+- Instalar sudo
+    - Bajo root: `su`:
+        -   `pkg update && pkg upgrade`
+        -   `pkg install sudo`
+
+- Instalar ports
+    sudo portsnap fetch
+    sudo portsnap extract
+
+- Instalar zsh:
+    sudo pkg install zsh
+
+- Instalar oh-my-zsh:
+    sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+- Instalar git:
+    sudo pkg update -f
+    sudo pkg install git
+
+- Instalar Python (Python ya está instalado, sólo hay que crear un link simbólico)
+    sudo ln -s /usr/local/bin/python3.6 /usr/local/bin/python
+    python --version
+    sudo pkg install py36-pip
+    pip --version
+
+- For executing thing installed with pip    
+    vi ~/.zshrc
+    export PATH=$PATH:.local/bin/
+
+- Instalar conan
+    pip install conan --upgrade --user
+    conan user
+    pip install conan_package_tools --upgrade --user
+    pip install cpuid --upgrade --user
+
+- Corregir conan
+    - cd /usr/ports/databases/py-sqlite3
+    - make clean
+    - sudo make PYTHON_VERSION=python3.6 install
+
+- Clonar repositorio:
+    cd
+    mkdir kth
+    cd kth
+    git clone https://github.com/k-nuth/kth-conan-gmp.git
+    cd kth-conan-gmp.git
+    git submodule init
+    git submodule update --remote

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/k-nuth/kth-conan-gmp.svg?branch=master)](https://travis-ci.org/k-nuth/kth-conan-gmp) [![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/k-nuth/kth-conan-gmp?branch=master&svg=true)](https://ci.appveyor.com/project/k-nuth/kth-conan-gmp?branch=master)
+[![Build Status](https://travis-ci.org/k-nuth/kth-conan-gmp.svg?branch=master)](https://travis-ci.org/k-nuth/kth-conan-gmp) [![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/k-nuth/kth-conan-gmp?branch=master&svg=true)](https://ci.appveyor.com/project/k-nuth/kth-conan-gmp?branch=master) [![Build Status](https://api.cirrus-ci.com/github/k-nuth/kth-conan-gmp.svg?branch=master)](https://cirrus-ci.com/github/k-nuth/kth-conan-gmp)
 
 # kth-conan-gmp
 

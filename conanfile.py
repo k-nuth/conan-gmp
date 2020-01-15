@@ -241,6 +241,13 @@ class KthGmpConan(ConanFile):
             os_part = 'pc-linux-gnu'
         elif self.settings.os == "Windows" and self.settings.compiler == "gcc": #MinGW
             os_part = 'pc-msys'
+        elif self.settings.os == "FreeBSD":
+            os_part = 'pc-freebsd'
+
+# $ ./configure
+# checking build system type... sandybridge-unknown-freebsd12.0
+# checking host system type... sandybridge-unknown-freebsd12.0            
+
 
         complete_host = "%s-%s" % (self.options.microarchitecture, os_part)
         host_string = " --build=%s --host=%s" % (complete_host, complete_host)
