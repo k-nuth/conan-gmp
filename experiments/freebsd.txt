@@ -57,7 +57,7 @@ FreeBSD setup
     cd
     mkdir kth
     cd kth
-    git clone https://github.com/k-nuth/kth-conan-gmp.git
-    cd kth-conan-gmp.git
+    git clone https://github.com/k-nuth/conan-gmp.git
+    cd conan-gmp.git
     git submodule init
     git submodule update --remote
