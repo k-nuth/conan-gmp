@@ -23,7 +23,7 @@ def handle_microarchs(opt_name, microarchs, filtered_builds, settings, options, 
 
 if __name__ == "__main__":
     builder = ConanMultiPackager(username="kth", channel="stable"
-                                 , remotes="https://api.bintray.com/conan/k-nuth/kth, https://api.bintray.com/conan/bitprim/bitprim")
+                                 , remotes="https://api.bintray.com/conan/k-nuth/kth")
     builder.add_common_builds(shared_option_name="gmp:shared", pure_c=True)
     builder.password = os.getenv("CONAN_PASSWORD")
 
