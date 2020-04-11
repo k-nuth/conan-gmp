@@ -101,7 +101,7 @@ def translate_alias(alias):
 
 class KthGmpConan(ConanFile):
     name = "gmp"
-    version = "6.1.2"
+    version = "6.2.0"
     url = "https://github.com/k-nuth/conan-gmp"
     ZIP_FOLDER_NAME = "gmp-%s" % version
     
@@ -186,8 +186,8 @@ class KthGmpConan(ConanFile):
 
 
     def source(self):
-        # https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
-        zip_name = "gmp-%s.tar.bz2" % self.version
+        # https://gmplib.org/download/gmp/gmp-6.2.0.tar.lz
+        zip_name = "gmp-%s.tar.lz" % self.version
         download("http://gmplib.org/download/gmp/%s" % zip_name, zip_name)
         # download("http://gnu.uberglobalmirror.com/gmp/%s" % zip_name, zip_name)
 
@@ -275,8 +275,8 @@ class KthGmpConan(ConanFile):
         disable_assembly = "--disable-assembly" if self.settings.arch == "x86" else ""
 
         # ./configure --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --program-prefix= --disable-dependency-tracking --enable-cxx
-        # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure --with-pic --enable-static --enable-shared  --enable-cxx
-        # WARN: cd gmp-6.1.2 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure  --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --with-pic --enable-static --enable-shared  --enable-cxx --host 
+        # WARN: cd gmp-6.2.0 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure --with-pic --enable-static --enable-shared  --enable-cxx
+        # WARN: cd gmp-6.2.0 && env LIBS="" LDFLAGS="" CFLAGS="-fPIC  " CPPFLAGS="-fPIC  " ./configure  --build=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu --with-pic --enable-static --enable-shared  --enable-cxx --host 
 
         with_pic_str = "--with-pic" if self.fPIC_enabled else ""
         

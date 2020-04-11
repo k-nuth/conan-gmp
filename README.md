@@ -4,7 +4,7 @@
 
 [Conan.io](https://conan.io) package for GMP library. https://gmplib.org/
 
-The packages generated with this **conanfile** can be found in [conan.io](https://conan.io/source/gmp/6.1.2/k-nuth/k-nuth).
+The packages generated with this **conanfile** can be found in [conan.io](https://conan.io/source/gmp/6.2.0/k-nuth/k-nuth).
 
 ## Build packages
 
@@ -14,20 +14,20 @@ Download conan client from [Conan.io](https://conan.io) and run:
     
 ## Upload packages to server
 
-    $ conan upload gmp/6.1.2@kth/stable --all
+    $ conan upload gmp/6.2.0@kth/stable --all
     
 ## Reuse the packages
 
 ### Basic setup
 
-    $ conan install gmp/6.1.2@kth/stable
+    $ conan install gmp/6.2.0@kth/stable
     
 ### Project setup
 
 If you handle multiple dependencies in your project is better to add a *conanfile.txt*
     
     [requires]
-    gmp/6.1.2@kth/stable
+    gmp/6.2.0@kth/stable
 
     [options]
     gmp:shared=false # true
