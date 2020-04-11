@@ -168,8 +168,6 @@ class KthGmpConan(ConanFile):
 
         new_march = translate_alias(self.options.microarchitecture)
 
-        # self.output.error(str(new_march))
-
         if march_from == 'user defined':
             self.output.info("Provided microarchitecture (%s): %s" % (march_from, self.options.microarchitecture))
         else:
