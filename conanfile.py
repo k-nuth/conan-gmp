@@ -133,7 +133,6 @@ class KthGmpConan(ConanFile):
                       "enable-assert=False", \
                       "microarchitecture=_DUMMY_"
 
-    # requires = "m4/1.4.18@bitprim/stable"
     # build_requires = "m4/1.4.18@bitprim/stable"
     build_requires = "m4/1.4.18@"
 
