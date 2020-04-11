@@ -186,8 +186,8 @@ class KthGmpConan(ConanFile):
 
 
     def source(self):
-        # https://gmplib.org/download/gmp/gmp-6.2.0.tar.lz
-        zip_name = "gmp-%s.tar.lz" % self.version
+        # https://gmplib.org/download/gmp/gmp-6.2.0.tar.xz
+        zip_name = "gmp-%s.tar.xz" % self.version
         download("http://gmplib.org/download/gmp/%s" % zip_name, zip_name)
         # download("http://gnu.uberglobalmirror.com/gmp/%s" % zip_name, zip_name)
 
