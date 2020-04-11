@@ -134,7 +134,8 @@ class KthGmpConan(ConanFile):
                       "microarchitecture=_DUMMY_"
 
     # requires = "m4/1.4.18@bitprim/stable"
-    build_requires = "m4/1.4.18@bitprim/stable"
+    # build_requires = "m4/1.4.18@bitprim/stable"
+    build_requires = "m4/1.4.18@"
 
     @property
     def msvc_mt_build(self):
