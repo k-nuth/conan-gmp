@@ -27,3 +27,4 @@ pip install cpuid --upgrade
 # python -c "exec(\"import cpuid\\nprint(cpuid.cpu_microarchitecture())\")" || true
 
 conan user
+conan install m4/1.4.18@
