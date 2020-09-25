@@ -27,4 +27,7 @@ pip install cpuid --upgrade
 # python -c "exec(\"import cpuid\\nprint(cpuid.cpu_microarchitecture())\")" || true
 
 conan user
-conan install m4/1.4.18@
+
+if [[ "$(uname -s)" == 'Darwin' ]]; then
+    conan install m4/1.4.18@ --build=m4
+fi
