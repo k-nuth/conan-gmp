@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/conan-io/conan-center-index",
+  "commit": "6f3abb462bd77f361754da844ab7137ff1d3a567",
+  "path": "recipes/gmp",
+  "license": "MIT"
+}

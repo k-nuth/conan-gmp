@@ -1,0 +1,101 @@
+name: Verify packages
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - {name: linux-gcc, os: ubuntu-24.04, compiler: gcc, version: '16', checks: 'True'}
+          - {name: macos-apple-clang, os: macos-26, compiler: apple-clang, version: '21', checks: 'True'}
+          - {name: windows-msvc, os: windows-2025, compiler: msvc, version: '194', checks: 'False'}
+          - {name: emscripten, os: ubuntu-24.04, compiler: emcc, version: '6.0.13', checks: 'False'}
+    name: package (${{ matrix.platform.name }})
+    runs-on: ${{ matrix.platform.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - name: Select compiler
+        shell: bash
+        run: |
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
+            ci/install_gcc.sh 16
+          elif [[ "${{ runner.os }}" == "macOS" ]]; then
+            sudo xcode-select --switch /Applications/Xcode_26.6.app/Contents/Developer
+            echo "CC=clang" >> "$GITHUB_ENV"
+            echo "CXX=clang++" >> "$GITHUB_ENV"
+          fi
+      - name: Select MSVC 14.44
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $installation = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $installation) { throw 'Visual Studio installation not found' }
+          $toolsetRoot = Join-Path $installation 'VC\Tools\MSVC'
+          $toolset = Get-ChildItem $toolsetRoot -Directory |
+            Where-Object Name -Like '14.44.*' |
+            Sort-Object Name -Descending |
+            Select-Object -First 1 -ExpandProperty Name
+          if (-not $toolset) { throw "MSVC 14.44 is not installed under $toolsetRoot" }
+          $compiler = Join-Path $installation "VC\Tools\MSVC\$toolset\bin\Hostx64\x64\cl.exe"
+          if (-not (Test-Path $compiler)) { throw "MSVC x64 compiler not found at $compiler" }
+          $devShell = Join-Path $installation 'Common7\Tools\Microsoft.VisualStudio.DevShell.dll'
+          Import-Module $devShell
+          Enter-VsDevShell -VsInstallPath $installation -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64 -vcvars_ver=14.44'
+          @('PATH', 'INCLUDE', 'LIB', 'LIBPATH', 'VCToolsInstallDir', 'VCINSTALLDIR', 'VSINSTALLDIR', 'WindowsSdkDir', 'WindowsSDKVersion', 'UCRTVersion', 'UniversalCRTSdkDir') | ForEach-Object {
+            $value = [Environment]::GetEnvironmentVariable($_)
+            if ($value) { "$_=$value" >> $env:GITHUB_ENV }
+          }
+          "CXX=$compiler" >> $env:GITHUB_ENV
+          "VSWHERE=$vswhere" >> $env:GITHUB_ENV
+      - run: python -m pip install conan==2.34.0 cmake==4.4.4
+      - run: conan profile detect
+      - name: Configure VS 2026 with Ninja
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $profile = Join-Path $env:USERPROFILE '.conan2\profiles\default'
+          Add-Content $profile "`n[conf]`ntools.cmake.cmaketoolchain:generator=Ninja`ntools.microsoft.msbuild:vs_version=18"
+      - name: Check the detected compiler
+        if: matrix.platform.compiler != 'emcc'
+        shell: bash
+        run: |
+          conan profile show -pr:h default
+          conan profile show -pr:h default | grep -Fx "compiler=${{ matrix.platform.compiler }}"
+          conan profile show -pr:h default | grep -Fx "compiler.version=${{ matrix.platform.version }}"
+      - name: Add the Emscripten toolchain recipe
+        if: matrix.platform.compiler == 'emcc'
+        run: |
+          git clone https://github.com/conan-io/conan-toolchains.git ~/conan-toolchains
+          # The same revision of the emsdk recipe that Knuth builds with.
+          git -C ~/conan-toolchains checkout --detach 11b83330cdeb20622fe4b097dccb254969639a54
+          conan remote add conan-toolchains ~/conan-toolchains
+      - name: Create the package
+        shell: bash
+        run: |
+          if [[ "${{ matrix.platform.compiler }}" == "emcc" ]]; then
+            host=(-pr:h profiles/emscripten)
+          else
+            host=(-s compiler.cppstd=23)
+          fi
+          echo "HOST_ARGS=${host[*]}" >> "$GITHUB_ENV"
+          conan create recipes/gmp/all --version 6.3.0 "${host[@]}" -pr:b default \
+            --build='gmp/*' --build=missing -o 'gmp/*:run_checks=${{ matrix.platform.checks }}'
+      - name: Compare the arithmetic with the expected digest
+        shell: bash
+        run: conan test tests/crosscheck gmp/6.3.0 $HOST_ARGS -pr:b default

@@ -1,0 +1,44 @@
+--- longlong.h-orig
++++ longlong.h
+@@ -2052,7 +2052,41 @@
+     (r) = __udiv_qrnnd_r;						\
+   } while (0)
+ #endif
++
+ 
++/* WebAssembly multiplies and divides 64-bit integers with single
++   instructions.  With 32-bit limbs a double limb fits in one of them; with
++   64-bit limbs the compiler provides a 128-bit integer.  The generic macros
++   below build both operations out of half limbs instead.  */
++#if defined (__wasm__) && W_TYPE_SIZE == 32
++#if !defined (umul_ppmm)
++#define umul_ppmm(ph, pl, m0, m1) \
++  do {									\
++    unsigned long long __ll = (unsigned long long) (m0) * (m1);		\
++    (ph) = (UWtype) (__ll >> 32);					\
++    (pl) = (UWtype) __ll;						\
++  } while (0)
++#endif
++#if !defined (udiv_qrnnd)
++#define udiv_qrnnd(q, r, n1, n0, d) \
++  do {									\
++    unsigned long long __n = ((unsigned long long) (n1) << 32) | (n0);	\
++    UWtype __d = (d);							\
++    (q) = (UWtype) (__n / __d);						\
++    (r) = (UWtype) (__n % __d);						\
++  } while (0)
++#endif
++#endif
++#if defined (__wasm__) && W_TYPE_SIZE == 64 && defined (__SIZEOF_INT128__)
++#if !defined (umul_ppmm)
++#define umul_ppmm(ph, pl, m0, m1) \
++  do {									\
++    unsigned __int128 __ll = (unsigned __int128) (m0) * (m1);		\
++    (ph) = (UWtype) (__ll >> 64);					\
++    (pl) = (UWtype) __ll;						\
++  } while (0)
++#endif
++#endif
+ 
+ /* If this machine has no inline assembler, use C macros.  */
+ 
