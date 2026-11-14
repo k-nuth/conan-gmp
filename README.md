@@ -104,14 +104,13 @@ followed by the local changes. Review both, apply what is wanted to
 
 ## Publish
 
-After the matrix passes, upload the reviewed recipe revision to the intended
-remote:
+When a push to `main` passes the whole matrix, CI uploads the recipe to the
+Knuth package remote (`https://packages.kth.cash/api/`). Only the recipe is
+uploaded: each consumer builds GMP with its own profile. The job summary shows
+the published recipe revision, which is what a consumer pins.
 
-```sh
-conan upload 'gmp/6.3.0#<recipe-revision>' -r <remote> --confirm
-```
-
-Nothing here uploads packages or changes the version pins of its consumers.
+The job needs the `CONAN_LOGIN_USERNAME` and `CONAN_3_PASSWORD` secrets.
+Nothing here changes the version pins of the consumers.
 
 Recipe code keeps CCI's MIT license. GMP is distributed under LGPL-3.0 or
 GPL-2.0; its license files are included in the packages.

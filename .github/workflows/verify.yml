@@ -99,3 +99,42 @@ jobs:
       - name: Compare the arithmetic with the expected digest
         shell: bash
         run: conan test tests/crosscheck gmp/6.3.0 $HOST_ARGS -pr:b default
+
+  # Uploads the recipe, not binaries: each consumer builds GMP with its own
+  # profile. Uploading a revision the remote already has changes nothing.
+  publish:
+    name: publish recipe
+    needs: package
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      CONAN_REMOTE: kth
+      CONAN_REMOTE_URL: https://packages.kth.cash/api/
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - run: python -m pip install conan==2.34.0
+      - name: Export the recipe
+        run: |
+          conan profile detect
+          conan export recipes/gmp/all --version 6.3.0
+          conan list 'gmp/6.3.0#*'
+      - name: Upload the recipe
+        env:
+          CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }}
+          CONAN_PASSWORD: ${{ secrets.CONAN_3_PASSWORD }}
+        run: |
+          if [[ -z "$CONAN_LOGIN_USERNAME" || -z "$CONAN_PASSWORD" ]]; then
+            echo "::error::CONAN_LOGIN_USERNAME and CONAN_3_PASSWORD are not available to this repository."
+            exit 1
+          fi
+          conan remote add "$CONAN_REMOTE" "$CONAN_REMOTE_URL"
+          conan remote login "$CONAN_REMOTE" "$CONAN_LOGIN_USERNAME" -p "$CONAN_PASSWORD"
+          conan upload 'gmp/6.3.0' -r "$CONAN_REMOTE" --only-recipe --confirm
+          revision="$(conan list 'gmp/6.3.0#latest' --format=json | python -c 'import json,sys; d=json.load(sys.stdin); print(next(iter(d["Local Cache"]["gmp/6.3.0"]["revisions"])))')"
+          echo "Published \`gmp/6.3.0#${revision}\` to ${CONAN_REMOTE_URL}" >> "$GITHUB_STEP_SUMMARY"
